@@ -1,0 +1,1942 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+<title>北海道 花めぐり 2026</title>
+
+<!-- Leaflet.js — OpenStreetMap (free, no API key needed) -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Noto+Sans+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+/* ════════════════════════════════
+   TOKENS
+════════════════════════════════ */
+:root{
+  --ink:#1e1a16; --ink-mid:#6a6058; --ink-soft:#a89e94; --ink-xs:#c8c0b8;
+  --cream:#f7f4ef; --surface:rgba(255,255,255,.97);
+  --azure:#5d9db8; --azure-s:#dbedf5; --azure-g:rgba(93,157,184,.15);
+  --blush:#c07890; --blush-s:#f0dde6; --blush-g:rgba(192,120,144,.13);
+  --sage:#7a9e78;  --sage-s:#ddeedd;  --sage-g:rgba(122,158,120,.13);
+  --lav:#9080b8;   --lav-s:#e8e2f5;   --lav-g:rgba(144,128,184,.13);
+  --sand:#b89868;  --sand-s:#f0e8d8;  --sand-g:rgba(184,152,104,.12);
+  --teal:#5a9898;  --teal-s:#d8eeee;  --teal-g:rgba(90,152,152,.12);
+  --g1:rgba(255,255,255,.92); --g2:rgba(255,255,255,.78); --gb:rgba(255,255,255,.58);
+  --s0:0 1px 4px rgba(50,38,28,.06);
+  --s1:0 2px 14px rgba(50,38,28,.10);
+  --s2:0 6px 28px rgba(50,38,28,.13);
+  --s3:0 16px 52px rgba(50,38,28,.18);
+  --s4:0 26px 68px rgba(50,38,28,.22);
+  --hdr:72px; --tabs:46px; --sheet:250px; --card-img:100px; --mbar:46px;
+  --sp:.38s cubic-bezier(.34,1.56,.64,1);
+  --eo:.26s cubic-bezier(.22,.68,0,1);
+  --ei:.32s cubic-bezier(.4,0,.2,1);
+}
+
+/* ════════════════════════════════
+   RESET
+════════════════════════════════ */
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:'Noto Sans TC',sans-serif;
+  color:var(--ink);background:var(--cream);
+  display:flex;flex-direction:column;
+  width:100%;max-width:430px;margin:0 auto;
+  position:fixed;
+  top:0;left:0;right:0;bottom:0;
+  /* JS will set actual height via --app-h */
+  height:100%;
+  /* iOS safe area — top only; bottom handled by sheet/track */
+  padding-top:env(safe-area-inset-top,0px);
+  padding-left:env(safe-area-inset-left,0px);
+  padding-right:env(safe-area-inset-right,0px);
+}
+
+/* ════════════════════════════════
+   HEADER
+════════════════════════════════ */
+.app-header{
+  flex-shrink:0;height:var(--hdr);min-height:var(--hdr);
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  padding:0 20px 13px;z-index:100;
+  background:
+    radial-gradient(ellipse 90% 70% at 88% -5%,rgba(160,205,225,.42) 0%,transparent 56%),
+    radial-gradient(ellipse 70% 55% at 5% 105%,rgba(210,178,212,.30) 0%,transparent 55%),
+    linear-gradient(162deg,#edf4fb 0%,#f6eef5 46%,#edf4ed 100%);
+}
+.app-header::before{content:'';position:absolute;inset:0;background:linear-gradient(108deg,transparent 0%,rgba(255,255,255,.22) 48%,transparent 52%);pointer-events:none}
+.app-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(175,162,148,.18) 25%,rgba(175,162,148,.18) 75%,transparent)}
+.hb{position:absolute;border-radius:50%;pointer-events:none;filter:blur(30px);animation:blobD 10s ease-in-out infinite}
+.hb1{width:125px;height:125px;background:rgba(155,205,228,.30);top:-45px;right:-15px}
+.hb2{width:85px;height:85px;background:rgba(212,172,200,.20);top:12px;left:-12px;animation-delay:-3s;animation-duration:12s}
+.hb3{width:60px;height:60px;background:rgba(162,205,160,.16);bottom:-8px;right:82px;animation-delay:-6s;animation-duration:9s}
+@keyframes blobD{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(4px,-5px) scale(1.06)}66%{transform:translate(-3px,4px) scale(.96)}}
+.hdr-petals{position:absolute;inset:0;pointer-events:none;opacity:.14}
+.hdr-top{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1;margin-bottom:6px}
+.hdr-icons{font-size:12px;opacity:.50;letter-spacing:1px}
+.hdr-badge{
+  background:var(--g1);backdrop-filter:blur(14px) saturate(1.5);-webkit-backdrop-filter:blur(14px) saturate(1.5);
+  border-radius:30px;padding:4px 12px;font-size:9.5px;color:var(--ink-mid);
+  letter-spacing:.5px;font-weight:500;border:1px solid var(--gb);box-shadow:var(--s0);
+}
+.hdr-ja{font-size:8px;color:rgba(70,60,50,.36);letter-spacing:2.4px;position:relative;z-index:1;font-family:'Noto Serif JP',serif;font-weight:300;margin-bottom:3px}
+.hdr-title{font-family:'Noto Serif JP',serif;font-size:14px;font-weight:400;letter-spacing:.4px;line-height:1.3;position:relative;z-index:1;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hdr-sub{font-size:9px;color:var(--ink-soft);letter-spacing:.7px;margin-top:3px;position:relative;z-index:1;font-weight:300}
+
+/* ════════════════════════════════
+   DAY TABS
+════════════════════════════════ */
+.tabbar{
+  flex-shrink:0;height:var(--tabs);
+  background:rgba(247,244,239,.97);backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
+  border-bottom:1px solid rgba(190,178,162,.14);display:flex;align-items:center;z-index:90;
+  -webkit-overflow-scrolling:touch;
+  touch-action:pan-x;
+}
+.tabs-scroll{display:flex;gap:3px;overflow-x:auto;padding:0 14px;scrollbar-width:none;scroll-behavior:smooth;align-items:center;width:100%;touch-action:pan-x;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;}
+.tabs-scroll::-webkit-scrollbar{display:none}
+.day-tab{
+  flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  width:44px;height:44px;border-radius:11px;border:1.5px solid transparent;
+  cursor:pointer;transition:all var(--eo);gap:1px;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+}
+.day-tab .dt-l{font-size:7px;color:var(--ink-xs);letter-spacing:.8px;font-weight:600;text-transform:uppercase}
+.day-tab .dt-n{font-size:16px;font-weight:600;color:var(--ink-soft);line-height:1.1;font-family:'Noto Serif JP',serif;transition:color var(--eo)}
+.day-tab .dt-d{width:3px;height:3px;border-radius:50%;background:var(--blush);margin-top:2px;opacity:0;transition:opacity var(--eo),transform var(--eo) var(--sp);transform:scale(0)}
+.day-tab.active{background:rgba(255,255,255,.92);border-color:rgba(93,157,184,.24);box-shadow:var(--s1)}
+.day-tab.active .dt-l{color:var(--azure)}
+.day-tab.active .dt-n{color:var(--ink)}
+.day-tab.active .dt-d{opacity:1;transform:scale(1)}
+.day-tab:active{transform:scale(.9)}
+.tabs-loading{
+  width:100%;height:100%;
+  display:flex;align-items:center;padding-left:14px;
+  font-size:10px;color:var(--ink-xs);letter-spacing:.5px;
+}
+
+/* ════════════════════════════════
+   MAP AREA
+════════════════════════════════ */
+.map-area{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:none;-webkit-overflow-scrolling:none;min-height:200px;}
+
+/* Leaflet map container */
+#leaflet-map{
+  position:absolute;
+  top:0;left:0;right:0;bottom:0;
+  width:100%;height:100%;
+  min-height:200px;
+  z-index:1;
+}
+
+/* Custom Leaflet tile style overrides */
+.leaflet-tile-pane{filter:saturate(.82) brightness(1.04) hue-rotate(2deg)}
+/* Hide Leaflet default attribution (we keep credit inline) */
+.leaflet-control-attribution{display:none!important}
+.leaflet-control-zoom{display:none!important}
+
+/* Day transition overlay */
+.map-fade{position:absolute;inset:0;z-index:80;background:var(--cream);opacity:0;pointer-events:none;transition:opacity .18s ease}
+.map-fade.on{opacity:1;pointer-events:all}
+
+/* OSM credit — subtle */
+.osm-credit{
+  position:absolute;bottom:calc(var(--sheet) + var(--mbar) + 4px);left:50%;transform:translateX(-50%);
+  font-size:7.5px;color:rgba(100,90,80,.38);letter-spacing:.3px;
+  z-index:22;white-space:nowrap;pointer-events:none;
+}
+
+/* ── DAY INFO PILL ── */
+.map-pill{
+  position:absolute;top:14px;left:14px;right:14px;
+  display:flex;align-items:center;gap:10px;
+  background:var(--g1);backdrop-filter:blur(22px) saturate(1.9);-webkit-backdrop-filter:blur(22px) saturate(1.9);
+  border-radius:16px;padding:11px 16px;
+  box-shadow:var(--s2),inset 0 0 0 1px rgba(255,255,255,.58);
+  border:1px solid rgba(255,255,255,.65);z-index:25;
+}
+.mp-icon{font-size:15px;opacity:.7}
+.mp-body{flex:1;min-width:0}
+.mp-title{font-size:11.5px;font-weight:600;color:var(--ink);letter-spacing:.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mp-row{display:flex;gap:5px;margin-top:3px;align-items:center;flex-wrap:wrap}
+.mp-chip{font-size:8.5px;padding:2px 9px;border-radius:20px;font-weight:600;letter-spacing:.15px;background:var(--azure-g);color:var(--azure)}
+.mp-chip.d{background:var(--sand-g);color:var(--sand)}
+
+/* ── MAP CONTROLS ── */
+.map-controls{position:absolute;bottom:calc(var(--sheet) + var(--mbar) + 14px);right:14px;display:flex;flex-direction:column;gap:5px;z-index:25}
+.mc-btn{
+  width:44px;height:44px;border-radius:13px;
+  background:var(--g1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border:1px solid rgba(255,255,255,.65);box-shadow:var(--s1),inset 0 1px 0 rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:var(--ink-mid);
+  transition:transform var(--sp),box-shadow var(--eo);
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+}
+.mc-btn:active{transform:scale(.86);box-shadow:var(--s0)}
+
+/* ════════════════════════════════
+   CUSTOM LEAFLET MARKERS
+════════════════════════════════ */
+/* We build HTML markers via Leaflet DivIcon */
+.cpin{
+  display:flex;flex-direction:column;align-items:center;
+  cursor:pointer;
+  animation:pinFall .5s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes pinFall{
+  0%{opacity:0;transform:translateY(-18px) scale(.5)}
+  65%{transform:translateY(3px) scale(1.06)}
+  82%{transform:translateY(-2px) scale(.97)}
+  100%{opacity:1;transform:translateY(0) scale(1)}
+}
+.cpin-orb{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:14px;
+  border:1.5px solid rgba(255,255,255,.85);position:relative;
+  box-shadow:0 3px 10px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.10),inset 0 1px 0 rgba(255,255,255,.55);
+  animation:pinFloat 3.4s ease-in-out infinite;
+  transition:transform .22s cubic-bezier(.34,1.56,.64,1),box-shadow .22s;
+}
+.cpin-orb::after{content:'';position:absolute;top:4px;left:5px;width:10px;height:5px;background:rgba(255,255,255,.42);border-radius:50%}
+@keyframes pinFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.cpin-stem{width:1.5px;height:7px;background:linear-gradient(to bottom,rgba(255,255,255,.65),transparent);margin-top:-1px}
+.cpin-lbl{
+  font-size:7.5px;font-weight:600;letter-spacing:.15px;
+  background:rgba(255,255,255,.90);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border-radius:20px;padding:2px 7px;margin-top:2px;white-space:nowrap;
+  color:var(--ink-mid);box-shadow:0 1px 6px rgba(0,0,0,.10);
+  border:1px solid rgba(255,255,255,.65);max-width:80px;overflow:hidden;text-overflow:ellipsis;
+  font-family:'Noto Sans TC',sans-serif;
+}
+/* Active pin pulse */
+.cpin.active .cpin-orb{
+  transform:scale(1.18) translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,.24),inset 0 1px 0 rgba(255,255,255,.6);
+  animation:pinBobActive 2.4s ease-in-out infinite;
+}
+@keyframes pinBobActive{0%,100%{transform:scale(1.18) translateY(0)}50%{transform:scale(1.18) translateY(-5px)}}
+.cpin.active::before{
+  content:'';position:absolute;top:0;left:0;
+  width:32px;height:32px;border-radius:50%;
+  border:1.5px solid rgba(93,157,184,.5);
+  transform:translate(-50%,-100%);
+  animation:ringPulse 1.9s ease-out infinite;
+  pointer-events:none;
+  margin-left:16px;margin-top:2px;
+}
+@keyframes ringPulse{0%{transform:translate(-50%,-100%) scale(.9);opacity:.4}100%{transform:translate(-50%,-100%) scale(1.75);opacity:0}}
+
+/* Pin colours per type */
+.pt-sight  .cpin-orb{background:linear-gradient(148deg,rgba(172,220,170,.92),rgba(130,188,128,.96));color:#2a622a}
+.pt-onsen  .cpin-orb{background:linear-gradient(148deg,rgba(205,182,235,.90),rgba(172,148,218,.96));color:#46306e}
+.pt-night  .cpin-orb{background:linear-gradient(148deg,rgba(140,128,210,.90),rgba(112,100,192,.96));color:#1e145a}
+.pt-shop   .cpin-orb{background:linear-gradient(148deg,rgba(235,196,158,.90),rgba(210,165,118,.96));color:#6e4018}
+.pt-port   .cpin-orb{background:linear-gradient(148deg,rgba(158,210,228,.90),rgba(116,182,215,.96));color:#1a5e78}
+.pt-flower .cpin-orb{background:linear-gradient(148deg,rgba(235,178,215,.90),rgba(208,142,188,.96));color:#8a2858}
+.pt-drive  .cpin-orb{background:linear-gradient(148deg,rgba(178,205,228,.90),rgba(146,178,215,.96));color:#1e3e68}
+
+/* Route polyline drawn via Leaflet polyline — no separate SVG needed */
+
+/* ════════════════════════════════
+   BOTTOM SHEET
+════════════════════════════════ */
+.bottom-sheet{
+  position:absolute;bottom:0;left:0;right:0;
+  height:calc(var(--sheet) + var(--mbar) + env(safe-area-inset-bottom, 0px));
+  z-index:50;pointer-events:none;
+  background:var(--cream); /* ensure bg covers safe area zone */
+}
+/* frosted gradient fade above cards */
+.sheet-fog{
+  position:absolute;top:0;left:0;right:0;height:28px;
+  background:linear-gradient(to bottom,rgba(247,244,239,0),rgba(247,244,239,0));
+  pointer-events:none;
+}
+.sheet-handle{
+  position:absolute;top:var(--mbar);left:0;right:0;
+  height:22px;pointer-events:all;z-index:52;
+  display:flex;align-items:center;justify-content:center;
+  cursor:grab;touch-action:none;
+}
+.sheet-handle::after{
+  content:'';display:block;
+  width:32px;height:4px;border-radius:4px;
+  background:rgba(170,155,140,.28);
+}
+.card-dots{position:absolute;top:calc(var(--mbar) + 10px);left:0;right:0;display:flex;justify-content:center;gap:4px;pointer-events:none;z-index:52}
+.cdot{width:4.5px;height:4.5px;border-radius:3px;background:rgba(165,150,135,.22);transition:width .32s var(--sp),background .2s}
+.cdot.on{width:14px;background:var(--azure)}
+.card-track{
+  position:absolute;top:calc(var(--mbar) + 22px);left:0;right:0;bottom:env(safe-area-inset-bottom,0px);
+  display:flex;align-items:flex-start;gap:10px;
+  overflow-x:auto;overflow-y:hidden;
+  padding:4px 18px max(14px, calc(14px + env(safe-area-inset-bottom, 0px)));
+  scroll-snap-type:x mandatory;scrollbar-width:none;
+  pointer-events:all;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-x:contain;
+  will-change:scroll-position;
+  touch-action:pan-x;
+}
+.card-track::-webkit-scrollbar{display:none}
+
+/* ════════════════════════════════
+   STOP CARD
+════════════════════════════════ */
+.stop-card{
+  flex-shrink:0;
+  width:calc(100vw - 60px);
+  max-width:338px;
+  background:var(--surface);border-radius:20px;
+  box-shadow:var(--s3);border:1px solid rgba(255,255,255,.72);
+  scroll-snap-align:center;overflow:hidden;cursor:pointer;
+  opacity:.68;transform:scale(.91) translateY(8px);
+  transition:transform .4s var(--sp),opacity .32s var(--ei),box-shadow .32s var(--ei);
+  animation:cardRise .44s var(--sp) both;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+  will-change:transform,opacity;
+  -webkit-transform:scale(.91) translateY(8px);
+}
+.stop-card:nth-child(1){animation-delay:.04s}.stop-card:nth-child(2){animation-delay:.09s}
+.stop-card:nth-child(3){animation-delay:.13s}.stop-card:nth-child(4){animation-delay:.17s}
+.stop-card:nth-child(5){animation-delay:.21s}.stop-card:nth-child(6){animation-delay:.25s}
+@keyframes cardRise{0%{opacity:0;transform:scale(.86) translateY(24px)}100%{opacity:.68;transform:scale(.91) translateY(8px)}}
+.stop-card.active-card{
+  opacity:1 !important;transform:scale(1) translateY(0) !important;
+  box-shadow:var(--s4),inset 0 0 0 1px rgba(255,255,255,.6);
+  animation:cardRiseA .46s var(--sp) both;
+}
+@keyframes cardRiseA{0%{opacity:0;transform:scale(.88) translateY(24px)}100%{opacity:1;transform:scale(1) translateY(0)}}
+
+/* hero image */
+.sc-img{position:relative;width:100%;height:var(--card-img);overflow:hidden;background:#d4e8f0;flex-shrink:0}
+.sc-img img{width:100%;height:100%;object-fit:cover;transition:transform .7s var(--eo);display:block}
+.stop-card.active-card .sc-img img{transform:scale(1.04)}
+.sc-img::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 32%,rgba(16,12,8,.32) 100%);pointer-events:none}
+.sc-badge{position:absolute;top:9px;left:10px;z-index:2;font-size:8px;font-weight:600;letter-spacing:.4px;padding:3px 9px;border-radius:20px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);background:rgba(255,255,255,.72);color:var(--ink-mid);border:1px solid rgba(255,255,255,.65)}
+.sc-time{position:absolute;bottom:9px;right:10px;z-index:2;font-size:8px;font-weight:600;color:rgba(255,255,255,.90);text-shadow:0 1px 3px rgba(0,0,0,.40);letter-spacing:.2px}
+
+/* card body */
+.sc-body{padding:11px 14px 13px}
+.sc-titles{margin-bottom:6px}
+.sc-name-jp{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:400;color:var(--ink);letter-spacing:.4px;line-height:1.3;margin-bottom:1px}
+.sc-name-zh{font-size:10.5px;font-weight:500;color:var(--ink-soft);letter-spacing:.2px}
+.sc-meta{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:7px}
+.sc-tag{font-size:8.5px;padding:2.5px 8px;border-radius:20px;font-weight:600;letter-spacing:.15px}
+.tag-loc  {background:var(--azure-g);color:var(--azure)}
+.tag-dur  {background:var(--sand-g);color:var(--sand)}
+.tag-sight{background:var(--sage-g);color:var(--sage)}
+.tag-shop {background:var(--sand-g);color:var(--sand)}
+.tag-onsen{background:var(--lav-g);color:var(--lav)}
+.tag-drive{background:var(--azure-g);color:var(--azure)}
+.tag-night{background:var(--lav-g);color:var(--lav)}
+.tag-port {background:var(--teal-g);color:var(--teal)}
+.tag-flower{background:var(--blush-g);color:var(--blush)}
+.sc-note{font-size:11px;color:var(--ink-mid);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;font-weight:300}
+.sc-btns{display:flex;gap:7px}
+.sc-btn{
+  display:inline-flex;align-items:center;gap:3px;
+  font-size:9.5px;padding:10px 14px;border-radius:20px;
+  border:1px solid rgba(175,162,148,.15);background:rgba(245,242,238,.65);
+  color:var(--ink-mid);cursor:pointer;font-family:inherit;font-weight:600;
+  text-decoration:none;letter-spacing:.1px;transition:transform var(--sp),background .14s;
+  min-height:44px;touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.sc-btn:active{transform:scale(.91)}
+.sc-btn.map{color:var(--sage);background:rgba(122,158,120,.10);border-color:rgba(122,158,120,.20)}
+
+/* ════════════════════════════════
+   MODE BAR (浮在 bottom sheet 上方)
+════════════════════════════════ */
+.mode-bar{
+  position:absolute;
+  bottom:calc(var(--sheet) + env(safe-area-inset-bottom, 0px));
+  left:0;right:0;
+  height:var(--mbar);
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;z-index:55;
+  background:rgba(247,244,239,.97);
+  backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
+  border-top:1px solid rgba(190,178,162,.14);
+  pointer-events:all;
+  touch-action:manipulation;
+}
+/* safe area gap filler below mode-bar */
+.mode-bar::after{
+  content:'';position:absolute;
+  top:100%;left:0;right:0;
+  height:env(safe-area-inset-bottom, 34px);
+  background:rgba(247,244,239,.97);
+  z-index:1;
+}
+.mode-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:10px 18px;border-radius:20px;
+  font-size:11.5px;font-weight:600;letter-spacing:.1px;
+  cursor:pointer;border:none;font-family:inherit;
+  color:var(--ink-soft);background:transparent;
+  transition:all var(--eo);white-space:nowrap;
+  flex:1;justify-content:center;max-width:110px;
+  min-height:44px;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.mode-pill .mp-e{font-size:15px;line-height:1}
+.mode-pill.active{
+  background:var(--surface);
+  color:var(--ink);
+  box-shadow:var(--s1),inset 0 0 0 1px rgba(255,255,255,.7);
+  border-radius:20px;
+}
+.mode-pill.active .mp-e{transform:scale(1.12)}
+.mode-pill:active{transform:scale(.93)}
+
+/* ── alt separator (inside alt-group card) ── */
+.alt-sep{display:flex;align-items:center;gap:8px;padding:2px 14px}
+.alt-sep-line{flex:1;height:1px;background:rgba(190,178,162,.14)}
+.alt-sep-txt{font-size:8.5px;color:var(--ink-xs);font-family:'Noto Serif JP',serif;letter-spacing:.5px}
+
+/* ── Food + Hotel type tags ── */
+.rtag-loc    {background:var(--azure-g);color:var(--azure)}
+.rtag-ramen  {background:rgba(210,60,40,.10);color:#c02810}
+.rtag-sushi  {background:rgba(30,130,160,.10);color:#0a6888}
+.rtag-seafood{background:var(--teal-g);color:var(--teal)}
+.rtag-curry  {background:rgba(190,140,30,.12);color:#8a5800}
+.rtag-izakaya{background:var(--lav-g);color:var(--lav)}
+.rtag-bbq    {background:rgba(180,60,30,.10);color:#a03010}
+.rtag-yakitori{background:rgba(180,90,20,.10);color:#904010}
+.rtag-market {background:var(--sage-g);color:var(--sage)}
+.rtag-ryokan {background:var(--lav-g);color:var(--lav)}
+.rtag-restaurant{background:var(--sand-g);color:var(--sand)}
+.rtag-cafe   {background:rgba(160,110,60,.10);color:#7a4828}
+.rtag-airport{background:var(--azure-g);color:var(--azure)}
+
+/* ── panel temp markers – food & hotel ── */
+.pt-food   .cpin-orb{background:linear-gradient(148deg,rgba(235,180,80,.92),rgba(210,148,40,.96));color:#6e3000}
+.pt-hotel  .cpin-orb{background:linear-gradient(148deg,rgba(192,120,144,.88),rgba(165,88,114,.96));color:#5a1030}
+
+/* rc-meal-badge reused inside stop-card sc-badge slot */
+.sc-badge.breakfast{background:rgba(255,243,210,.92);color:#8a6020}
+.sc-badge.lunch    {background:rgba(210,240,215,.92);color:#2a6840}
+.sc-badge.dinner   {background:rgba(210,218,245,.92);color:#38308a}
+.sc-badge.cafe     {background:rgba(240,222,212,.92);color:#7a4828}
+
+/* ════════════════════════════════
+   MISC
+════════════════════════════════ */
+a{text-decoration:none}
+</style>
+</head>
+<body>
+
+<!-- ══ HEADER ══ -->
+<header class="app-header">
+  <svg class="hdr-petals" viewBox="0 0 390 104" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+    <g fill="#e0a8bc"><ellipse cx="22" cy="26" rx="7.5" ry="4.5" transform="rotate(-30 22 26)" opacity=".18"/><ellipse cx="38" cy="12" rx="6.5" ry="4" transform="rotate(24 38 12)" opacity=".14"/><ellipse cx="8" cy="50" rx="6" ry="3.5" transform="rotate(-52 8 50)" opacity=".12"/><ellipse cx="56" cy="38" rx="6.5" ry="3.8" transform="rotate(14 56 38)" opacity=".11"/></g>
+    <g fill="#e0a8bc"><ellipse cx="364" cy="20" rx="7" ry="4.2" transform="rotate(28 364 20)" opacity=".16"/><ellipse cx="375" cy="46" rx="5.5" ry="3.5" transform="rotate(-18 375 46)" opacity=".12"/><ellipse cx="352" cy="8" rx="6.5" ry="3.8" transform="rotate(44 352 8)" opacity=".11"/></g>
+    <g fill="#a095c8" opacity=".10"><circle cx="80" cy="60" r="2"/><circle cx="88" cy="72" r="1.6"/></g>
+    <g fill="#8ab88a" opacity=".09"><ellipse cx="315" cy="82" rx="3" ry="6.5" transform="rotate(-16 315 82)"/></g>
+  </svg>
+  <div class="hb hb1"></div><div class="hb hb2"></div><div class="hb hb3"></div>
+  <div class="hdr-top">
+    <div class="hdr-icons">🐱 🐕 🌸</div>
+    <div class="hdr-badge">✈️ 2026 · 6月17–25日</div>
+  </div>
+  <div class="hdr-title">北海道 9日8夜 賞花自駕之旅</div>
+</header>
+
+<!-- ══ DAY TABS ══ -->
+<div class="tabbar" id="tabbar"><div class="tabs-scroll" id="tabsScroll"><div class="tabs-loading"></div></div></div>
+
+<!-- ══ MAP AREA ══ -->
+<div class="map-area" id="mapArea">
+
+  <div class="map-fade" id="mapFade"></div>
+
+  <!-- Leaflet Map -->
+  <div id="leaflet-map"></div>
+
+  <!-- OSM Credit -->
+  <div class="osm-credit">© OpenStreetMap contributors</div>
+
+  <!-- Day info pill -->
+  <div class="map-pill" id="mapPill">
+    <div class="mp-icon">🗺</div>
+    <div class="mp-body">
+      <div class="mp-title" id="mpTitle">—</div>
+      <div class="mp-row">
+        <span class="mp-chip" id="mpRoute">—</span>
+        <span class="mp-chip d" id="mpDrive">—</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map controls -->
+  <div class="map-controls">
+    <div class="mc-btn" id="btnZoomIn">＋</div>
+    <div class="mc-btn" id="btnZoomOut">－</div>
+  </div>
+
+  <!-- Mode Bar — floats above bottom sheet -->
+  <div class="mode-bar" id="modeBar">
+    <button class="mode-pill active" data-mode="stops" onclick="switchMode('stops')">
+      <span class="mp-e">🗺</span><span>景點</span>
+    </button>
+    <button class="mode-pill" data-mode="food" onclick="switchMode('food')">
+      <span class="mp-e">🍜</span><span>食飯</span>
+    </button>
+    <button class="mode-pill" data-mode="hotel" onclick="switchMode('hotel')">
+      <span class="mp-e">🏨</span><span>住宿</span>
+    </button>
+  </div>
+
+  <!-- Bottom sheet — single unified track -->
+  <div class="bottom-sheet">
+    <div class="sheet-handle"></div>
+    <div class="card-dots" id="cardDots"></div>
+    <div class="card-track" id="cardTrack"></div>
+  </div>
+
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────
+   CRITICAL: iOS height fix
+   window.innerHeight is the only reliable value in
+   Safari (WKWebView, file://, Quick Look, etc).
+   100vh/dvh all fail in different scenarios.
+───────────────────────────────────────────────── */
+(function applyHeight(){
+  const h = window.innerHeight;
+  document.documentElement.style.setProperty('--real-h', h + 'px');
+  document.body.style.height = h + 'px';
+})();
+window.addEventListener('resize', function(){
+  const h = window.innerHeight;
+  document.documentElement.style.setProperty('--real-h', h + 'px');
+  document.body.style.height = h + 'px';
+  if(typeof map !== 'undefined' && map) map.invalidateSize();
+}, {passive:true});
+// Also fire on orientationchange for iPad/iPhone rotation
+window.addEventListener('orientationchange', function(){
+  setTimeout(function(){
+    const h = window.innerHeight;
+    document.documentElement.style.setProperty('--real-h', h + 'px');
+    document.body.style.height = h + 'px';
+    if(typeof map !== 'undefined' && map) map.invalidateSize();
+  }, 300);
+});
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 1：TILE LAYER（地圖底圖）
+   ── 一般不需要改，除非想換地圖風格
+   ── 可用選項：
+      OpenStreetMap 標準：
+        "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      CartoDB Voyager（現用，較簡潔）：
+        "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+══════════════════════════════════════════════════════════════ */
+const TILE_URL  = "https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+const TILE_ATTR = "© OpenStreetMap contributors © CARTO";
+
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 2：DAY_VIEW — 每日地圖中心點 + 縮放級別
+   ──
+   ── 格式：[緯度, 經度, 縮放級別]
+   ──   縮放級別：13 = 一般城市, 14 = 較放大, 12 = 較縮小
+   ──
+   ── 📍 要改每日地圖中心 → 修改對應 Day 的 [lat, lng, zoom]
+   ── 📍 要新增一天 → 在陣列末尾加一行，同時在 itineraryData 新增對應日期
+   ── 📍 順序必須與 itineraryData 的 Day 排列一致（Day1 = 陣列第 0 項）
+   ══════════════════════════════════════════════════════════════ */
+const DAY_VIEW = [
+  [42.415, 141.105, 13],  // Day 1 · 6/17 · 登別
+  [41.793, 140.740, 13],  // Day 2 · 6/18 · 函館
+  [41.770, 140.730, 14],  // Day 3 · 6/19 · 函館市內
+  [43.191, 140.994, 13],  // Day 4 · 6/20 · 小樽
+  [43.062, 141.354, 13],  // Day 5 · 6/21 · 札幌
+  [43.347, 142.383, 13],  // Day 6 · 6/22 · 富良野
+  [43.596, 142.468, 13],  // Day 7 · 6/23 · 美瑛
+  [43.009, 141.565, 12],  // Day 8 · 6/24 · 北廣島
+  [42.775, 141.692, 13],  // Day 9 · 6/25 · 新千歲
+];
+
+let map, routePolyline, leafletMarkers = [];
+
+function initMap(dayIdx){
+  const [lat, lng, zoom] = DAY_VIEW[dayIdx] || DAY_VIEW[0];
+  if(!map){
+    map = L.map("leaflet-map", {
+      center:[lat, lng],
+      zoom: zoom,
+      zoomControl: false,
+      attributionControl: false,
+      zoomAnimation: true,
+      markerZoomAnimation: true,
+      // iOS: prevent rubber-band bounce fight with card scroll
+      bounceAtZoomLimits: false,
+      tapTolerance: 15,
+    });
+    L.tileLayer(TILE_URL, {
+      attribution: TILE_ATTR,
+      maxZoom: 19,
+      // Slightly desaturated via CSS filter on tile pane
+    }).addTo(map);
+
+    // Fix map tile loading — multiple attempts for Safari WKWebView
+    setTimeout(()=>{ map.invalidateSize(); }, 100);
+    setTimeout(()=>{ map.invalidateSize(); }, 400);
+    setTimeout(()=>{ map.invalidateSize(); }, 900);
+  } else {
+    map.flyTo([lat, lng], zoom, {
+      animate: true,
+      duration: 1.0,
+      easeLinearity: 0.35,
+    });
+  }
+}
+
+function zoomIn(){ map && map.zoomIn(); }
+function zoomOut(){ map && map.zoomOut(); }
+
+document.getElementById("btnZoomIn").onclick = zoomIn;
+document.getElementById("btnZoomOut").onclick = zoomOut;
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 3：IMGS — 圖片資料庫
+   ──
+   ── 所有景點卡的圖片都從這裡取用，景點 card 用 img:IMGS.xxx 引用
+   ── 要換圖片 → 把對應 key 的 URL 換掉即可，其他地方不用動
+   ── 要新增圖片 → 在這裡加一個新 key，然後在景點的 img 欄位引用
+   ──
+   ── 圖片建議尺寸：寬 700px，Unsplash 格式：...?w=700&q=80
+   ══════════════════════════════════════════════════════════════ */
+const IMGS = {
+  /* ── 新千歲 / 機場 ── */
+  chitose:       "https://images.unsplash.com/photo-1596854307943-57b4b3daef32?w=700&q=80",
+  departure:     "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=700&q=80",
+
+  /* ── 登別 ── */
+  jigokudani:    "https://images.unsplash.com/photo-1614094082869-cd4e4b2905c7?w=700&q=80",
+  oyunuma:       "https://images.unsplash.com/photo-1601823984263-b87b59798b70?w=700&q=80",
+  onsen:         "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=700&q=80",
+  ryokan:        "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=700&q=80",
+
+  /* ── 函館 ── */
+  hakodate_night:"https://images.unsplash.com/photo-1514890547357-a9ee288728e0?w=700&q=80",
+  kanemori:      "https://images.unsplash.com/photo-1613387275674-cb92af1c29d1?w=700&q=80",
+  motomachi:     "https://images.unsplash.com/photo-1560541919-eb5c2da6a5a3?w=700&q=80",
+  hachimanzaka:  "https://images.unsplash.com/photo-1534430480872-3498386e7856?w=700&q=80",
+  asaichi:       "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=700&q=80",
+  goryokaku:     "https://images.unsplash.com/photo-1590559899731-a382839e5549?w=700&q=80",
+
+  /* ── 途中 / 自駕 ── */
+  drive:         "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=700&q=80",
+  yakumo:        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=700&q=80",
+  crab:          "https://images.unsplash.com/photo-1563257066-abb2823d3bba?w=700&q=80",
+
+  /* ── 小樽 ── */
+  otaru_canal:   "https://images.unsplash.com/photo-1580824456624-3f18d84ead97?w=700&q=80",
+  otaru_glass:   "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=700&q=80",
+  orgel:         "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=700&q=80",
+  sankaku:       "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=700&q=80",
+
+  /* ── 札幌 ── */
+  odori:         "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=700&q=80",
+  tanukikoji:    "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=700&q=80",
+
+  /* ── 富良野 ── */
+  tomita:        "https://images.unsplash.com/photo-1490750967868-88df5691cc91?w=700&q=80",
+  furano_field:  "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=700&q=80",
+  ningle:        "https://images.unsplash.com/photo-1511884642898-4c92249e20b6?w=700&q=80",
+
+  /* ── 美瑛 ── */
+  patchwork:     "https://images.unsplash.com/photo-1474540412665-1cdae210ae6b?w=700&q=80",
+  bluepond:      "https://images.unsplash.com/photo-1620641788421-7a1c342ea42e?w=700&q=80",
+  shikisai:      "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=700&q=80",
+  shirogane:     "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=700&q=80",
+  sevenstars:    "https://images.unsplash.com/photo-1418065460487-3e41a6c84dc5?w=700&q=80",
+
+  /* ── 購物 / 其他 ── */
+  outlet:        "https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?w=700&q=80",
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 4：itineraryData — 每日行程景點
+   ──
+   ── 📅 要改出發/抵達日期  → 改 date（如 "6月17日"）
+   ── 🏷  要改標題/主題     → 改 label 和 theme
+   ── 🚗 要改車程資訊       → 改 drive.route / drive.km / drive.time
+   ──
+   ── 每個景點 stop 的欄位說明：
+   ──   nameZh    → 景點中文名稱（顯示在卡片上）
+   ──   nameJp    → 景點日文名稱（備用 / 搜尋用）
+   ──   region    → 所在地區（卡片 chip 顯示）
+   ──   time      → 預計抵達時間（如 "13:30" 或 "下午"）
+   ──   duration  → 預計停留時間（如 "1hr" / "45min" / "—"）
+   ──   type      → 景點分類，影響 marker 顏色和 tag 樣式
+   ──              可用值：sight / shop / onsen / drive / night / port / flower
+   ──   typeLabel → 顯示在 chip 的中文類別名稱
+   ──   emoji     → 卡片和 marker 上顯示的 emoji
+   ──   mapQuery  → ⭐ Google Map 搜尋關鍵字（影響「📍 Google Map」按鈕）
+   ──   note      → 景點備註說明（顯示在卡片內文）
+   ──   img       → 卡片頂部圖片，使用 IMGS.xxx 引用（見 SECTION 3）
+   ──   latlng    → ⭐ 地圖 marker 位置 [緯度, 經度]
+   ──              可在 Google Maps 右鍵複製座標
+   ──
+   ── ➕ 新增景點 → 在對應 day 的 stops 陣列末尾加一個 {} 物件
+   ── ➖ 刪除景點 → 刪除對應 stop 的整個 {} 物件（包括前後的逗號）
+   ── 📅 新增一天 → 在陣列末尾加一個完整 day 物件，並同步更新 DAY_VIEW
+   ══════════════════════════════════════════════════════════════ */
+const itineraryData = [
+  /* ────────────────────────────────
+     Day 1 · 6月17日 · 新千歲 → 登別
+  ──────────────────────────────── */
+  {
+    day:1, date:"6月17日", label:"新千歲 → 登別",
+    theme:"溫泉♨️ · 地獄谷",
+    drive:{route:"新千歲 → 登別", km:"約110km", time:"約1.5hr"},
+    stops:[
+      {nameJp:"新千歳空港・レンタカー受取", nameZh:"新千歲機場 · 取車",
+       region:"千歲市", time:"11:00", duration:"1hr",
+       type:"drive", typeLabel:"出發",
+       emoji:"✈️", mapQuery:"新千歳空港 北海道",
+       note:"CX6356 11:10 落地，辦理租車手續，確認車況加滿油，前往登別約 1.5 小時。",
+       img:IMGS.chitose, latlng:[42.775, 141.692]},
+
+      {nameJp:"登別地獄谷", nameZh:"登別地獄谷",
+       region:"登別市", time:"13:30", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌋", mapQuery:"登別地獄谷 北海道",
+       note:"火山溫泉地帶，硫磺氣瀰漫，沿棧道欣賞翻滾泉水，壯觀震撼。",
+       img:IMGS.jigokudani, latlng:[42.437, 141.108]},
+
+      {nameJp:"大湯沼", nameZh:"大湯沼",
+       region:"登別市", time:"14:30", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🫧", mapQuery:"大湯沼 登別 北海道",
+       note:"天然溫泉沼，湖面白煙裊裊，展望台可俯瞰全景。",
+       img:IMGS.oyunuma, latlng:[42.432, 141.104]},
+
+      {nameJp:"登別温泉街・鬼像", nameZh:"登別溫泉街 · 鬼像",
+       region:"登別市", time:"15:30", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"👹", mapQuery:"登別温泉街 北海道",
+       note:"登別標誌性的大鬼像，每天定時有鬼「出現」表演，沿街購買手信。",
+       img:IMGS.onsen, latlng:[42.435, 141.100]},
+
+      {nameJp:"温泉旅館・入浴", nameZh:"溫泉旅館 · 泡湯",
+       region:"登別市", time:"晚上", duration:"—",
+       type:"onsen", typeLabel:"溫泉",
+       emoji:"♨️", mapQuery:"ホテルまほろば 登別温泉",
+       note:"入住登別溫泉旅館，多種泉質浴池，硫磺泉、食鹽泉。",
+       img:IMGS.ryokan, latlng:[42.433, 141.099]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 2 · 6月18日 · 登別 → 函館
+  ──────────────────────────────── */
+  {
+    day:2, date:"6月18日", label:"登別 → 函館",
+    theme:"函館夜景🌃 · 歷史街區",
+    drive:{route:"登別 → 函館", km:"約150km", time:"約3.5hr"},
+    stops:[
+      {nameJp:"出発・函館へドライブ", nameZh:"出發 · 前往函館",
+       region:"高速公路", time:"09:30", duration:"3.5hr",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"登別市 北海道",
+       note:"早餐後 09:30 出發，沿道央自動車道南下，途中在八雲 PA 停靠休息。",
+       img:IMGS.drive, latlng:[42.415, 141.105]},
+
+      {nameJp:"八雲パーキングエリア", nameZh:"八雲 PA · 海景休息站",
+       region:"八雲町", time:"途中", duration:"30min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌊", mapQuery:"八雲パーキングエリア 北海道",
+       note:"可眺望噴火灣絕美海景，下車伸展補充能量。",
+       img:IMGS.yakumo, latlng:[42.262, 140.265]},
+
+      {nameJp:"金森赤レンガ倉庫", nameZh:"金森紅磚倉庫",
+       region:"函館市", time:"下午", duration:"1hr",
+       type:"port", typeLabel:"港口",
+       emoji:"🧱", mapQuery:"金森赤レンガ倉庫 函館 北海道",
+       note:"函館最具代表性歷史倉庫群，現改建為購物商場。",
+       img:IMGS.kanemori, latlng:[41.769, 140.722]},
+
+      {nameJp:"元町教会群", nameZh:"元町教堂區",
+       region:"函館市", time:"下午", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"⛪", mapQuery:"函館元町 教会群 北海道",
+       note:"多座明治時代西洋教堂，坡道兩旁洋館林立，異國情調濃厚。",
+       img:IMGS.motomachi, latlng:[41.775, 140.715]},
+
+      {nameJp:"八幡坂", nameZh:"八幡坂",
+       region:"函館市", time:"下午", duration:"30min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🛤️", mapQuery:"八幡坂 函館 北海道",
+       note:"函館最知名坡道街景，筆直石板路延伸至海港。",
+       img:IMGS.hachimanzaka, latlng:[41.773, 140.712]},
+
+      {nameJp:"函館山夜景", nameZh:"函館山夜景",
+       region:"函館市", time:"夜晚", duration:"1hr",
+       type:"night", typeLabel:"夜景",
+       emoji:"🌃", mapQuery:"函館山展望台 北海道",
+       note:"世界三大夜景！乘纜車上山，夜間 18:00 後最美，人多請早排隊。",
+       img:IMGS.hakodate_night, latlng:[41.760, 140.696]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 3 · 6月19日 · 函館市內遊
+  ──────────────────────────────── */
+  {
+    day:3, date:"6月19日", label:"函館市內遊",
+    theme:"五稜郭⭐ · 港口散步",
+    drive:{route:"函館市內", km:"市內", time:"步行/市電"},
+    stops:[
+      {nameJp:"函館朝市", nameZh:"函館朝市",
+       region:"函館市", time:"早上", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🎪", mapQuery:"函館朝市 北海道",
+       note:"每日 06:00 開始，新鮮海產農產品琳琅滿目，氣氛熱鬧。",
+       img:IMGS.asaichi, latlng:[41.775, 140.729]},
+
+      {nameJp:"五稜郭公園", nameZh:"五稜郭公園",
+       region:"函館市", time:"10:00", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"⭐", mapQuery:"五稜郭公園 函館 北海道",
+       note:"日本唯一星形西洋式城郭，公園綠意盎然。",
+       img:IMGS.goryokaku, latlng:[41.796, 140.757]},
+
+      {nameJp:"五稜郭タワー", nameZh:"五稜郭塔",
+       region:"函館市", time:"11:00", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🗼", mapQuery:"五稜郭タワー 函館 北海道",
+       note:"登塔俯瞰完整星形城郭，入場費 ¥900。",
+       img:IMGS.goryokaku, latlng:[41.796, 140.757]},
+
+      {nameJp:"湯の川海岸散歩", nameZh:"湯之川海邊散步",
+       region:"函館市", time:"下午", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌊", mapQuery:"湯の川 函館 海岸 北海道",
+       note:"函館東部溫泉鄉，海岸線平靜舒適，慢活氣息濃厚。",
+       img:IMGS.yakumo, latlng:[41.801, 140.786]},
+
+      {nameJp:"大門横丁・夜散歩", nameZh:"大門橫丁 · 居酒屋",
+       region:"函館市", time:"晚上", duration:"1.5hr",
+       type:"night", typeLabel:"夜景",
+       emoji:"🌉", mapQuery:"はこだて ひかりの屋台 大門横丁",
+       note:"函館屋台橫丁，氣氛熱鬧，推薦海鮮居酒屋。氣溫涼爽記得備外套。",
+       img:IMGS.hakodate_night, latlng:[41.769, 140.722]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 4 · 6月20日 · 函館 → 小樽
+  ──────────────────────────────── */
+  {
+    day:4, date:"6月20日", label:"函館 → 小樽",
+    theme:"小樽運河⚓ · 玻璃工藝",
+    drive:{route:"函館 → 小樽", km:"約280km", time:"約4.5hr"},
+    stops:[
+      {nameJp:"出発・小樽へ長距離ドライブ", nameZh:"出發 · 前往小樽",
+       region:"高速公路", time:"08:30", duration:"4.5hr",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"函館市 北海道",
+       note:"全程約 280km，建議 08:30–09:00 出發，途中在長萬部休息。",
+       img:IMGS.drive, latlng:[41.775, 140.728]},
+
+      {nameJp:"長万部・かなや蟹飯", nameZh:"長萬部 · かなや 蟹飯",
+       region:"長萬部町", time:"途中", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🦀", mapQuery:"長万部 かなや 北海道",
+       note:"著名蟹飯店，停留午餐休息補充體力，招牌かにめし必點。",
+       img:IMGS.crab, latlng:[42.543, 140.381]},
+
+      {nameJp:"小樽運河", nameZh:"小樽運河",
+       region:"小樽市", time:"約16:00", duration:"1hr",
+       type:"port", typeLabel:"港口",
+       emoji:"⚓", mapQuery:"小樽運河 北海道",
+       note:"石造倉庫沿河排列，黃昏燈光亮起，浪漫無比。",
+       img:IMGS.otaru_canal, latlng:[43.196, 140.994]},
+
+      {nameJp:"堺町通り", nameZh:"堺町通商店街",
+       region:"小樽市", time:"下午", duration:"1.5hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🛍️", mapQuery:"小樽 堺町通り 北海道",
+       note:"北一硝子、音樂盒堂、LeTAO，手信選擇豐富。",
+       img:IMGS.otaru_glass, latlng:[43.192, 140.999]},
+
+      {nameJp:"北一硝子", nameZh:"北一硝子",
+       region:"小樽市", time:"下午", duration:"45min",
+       type:"shop", typeLabel:"購物",
+       emoji:"🫙", mapQuery:"北一硝子 小樽 北海道",
+       note:"煤油燈裝飾的古典店，售賣各式精緻玻璃製品。",
+       img:IMGS.otaru_glass, latlng:[43.191, 140.998]},
+
+      {nameJp:"小樽オルゴール堂", nameZh:"小樽音樂盒堂",
+       region:"小樽市", time:"下午", duration:"30min",
+       type:"shop", typeLabel:"購物",
+       emoji:"🎵", mapQuery:"小樽オルゴール堂 北海道",
+       note:"可訂製個人專屬音樂盒，種類繁多。",
+       img:IMGS.orgel, latlng:[43.191, 140.997]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 5 · 6月21日 · 小樽 → 札幌
+  ──────────────────────────────── */
+  {
+    day:5, date:"6月21日", label:"小樽 → 札幌",
+    theme:"大通公園🌿 · 狸小路購物",
+    drive:{route:"小樽 → 札幌", km:"約40km", time:"約40分鐘"},
+    stops:[
+      {nameJp:"小樽三角市場", nameZh:"三角市場",
+       region:"小樽市", time:"上午", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🐟", mapQuery:"小樽三角市場 北海道",
+       note:"小樽著名傳統市場，海鮮新鮮直送，氣氛熱鬧。",
+       img:IMGS.sankaku, latlng:[43.196, 140.993]},
+
+      {nameJp:"小樽運河・朝の光", nameZh:"小樽運河日景",
+       region:"小樽市", time:"上午", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"☀️", mapQuery:"小樽運河 北海道",
+       note:"早上人少，陽光映照水面，清新怡人。",
+       img:IMGS.otaru_canal, latlng:[43.196, 140.994]},
+
+      {nameJp:"出発・札幌へ", nameZh:"出發 · 前往札幌",
+       region:"高速公路", time:"11:00", duration:"40min",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"小樽市 北海道",
+       note:"走道央自動車道，40 分鐘即達札幌。",
+       img:IMGS.drive, latlng:[43.195, 140.995]},
+
+      {nameJp:"大通公園", nameZh:"大通公園",
+       region:"札幌市", time:"下午", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌿", mapQuery:"大通公園 札幌 北海道",
+       note:"貫穿市中心的寬闊公園，夏季花卉盛開。",
+       img:IMGS.odori, latlng:[43.061, 141.353]},
+
+      {nameJp:"狸小路商店街", nameZh:"狸小路商店街",
+       region:"札幌市", time:"下午", duration:"1.5hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🦝", mapQuery:"狸小路 札幌 北海道",
+       note:"最老有蓋商店街，藥妝、服裝、土產密集。",
+       img:IMGS.tanukikoji, latlng:[43.058, 141.351]},
+
+      {nameJp:"札幌駅地下街", nameZh:"札幌站地下街",
+       region:"札幌市", time:"下午", duration:"1hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🏬", mapQuery:"札幌駅 地下街 北海道",
+       note:"連接 JR 塔、大丸、紀伊國屋，雨天購物首選。",
+       img:IMGS.tanukikoji, latlng:[43.068, 141.350]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 6 · 6月22日 · 札幌 → 富良野
+  ──────────────────────────────── */
+  {
+    day:6, date:"6月22日", label:"二條市場 → 富良野",
+    theme:"薰衣草🌸 · 花田",
+    drive:{route:"札幌 → 富良野", km:"約150km", time:"約2.5hr"},
+    stops:[
+      {nameJp:"札幌二条市場", nameZh:"二條市場 · 早餐",
+       region:"札幌市", time:"早上", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"🦑", mapQuery:"札幌二条市場 北海道",
+       note:"道地札幌早市，海鮮丼早餐首選，推薦海膽蟹肉丼。",
+       img:IMGS.asaichi, latlng:[43.060, 141.354]},
+
+      {nameJp:"出発・富良野へ", nameZh:"出發 · 前往富良野",
+       region:"高速公路", time:"09:30", duration:"2.5hr",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"札幌市 北海道",
+       note:"走道央自動車道轉富良野方向，中午抵達。",
+       img:IMGS.drive, latlng:[43.062, 141.354]},
+
+      {nameJp:"ファーム富田", nameZh:"富田農場",
+       region:"中富良野町", time:"下午", duration:"1.5hr",
+       type:"flower", typeLabel:"花田",
+       emoji:"💜", mapQuery:"ファーム富田 富良野 北海道",
+       note:"北海道最著名薰衣草農場！6月下旬盛開，免費入場。",
+       img:IMGS.tomita, latlng:[43.361, 142.443]},
+
+      {nameJp:"彩香の里", nameZh:"彩香之里",
+       region:"富良野市", time:"下午", duration:"1hr",
+       type:"flower", typeLabel:"花田",
+       emoji:"🌸", mapQuery:"彩香の里 富良野 北海道",
+       note:"人潮較少，更易拍到美麗花田照。",
+       img:IMGS.furano_field, latlng:[43.352, 142.448]},
+
+      {nameJp:"ニングルテラス", nameZh:"Ningle Terrace",
+       region:"富良野市", time:"傍晚", duration:"1hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌲", mapQuery:"ニングルテラス 富良野 北海道",
+       note:"森林中的木屋工藝店群，傍晚燈光夢幻迷人。",
+       img:IMGS.ningle, latlng:[43.337, 142.376]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 7 · 6月23日 · 富良野 + 美瑛
+  ──────────────────────────────── */
+  {
+    day:7, date:"6月23日", label:"富良野 + 美瑛",
+    theme:"丘の景色🌾 · 青池 · 花田",
+    drive:{route:"富良野 ⇄ 美瑛", km:"約80km", time:"約1hr"},
+    stops:[
+      {nameJp:"パッチワークの路・ケンとメリーの木", nameZh:"拼布之路 · Ken & Mary 樹",
+       region:"美瑛町", time:"上午", duration:"1.5hr",
+       type:"sight", typeLabel:"景點",
+       emoji:"🌾", mapQuery:"パッチワークの路 美瑛 北海道",
+       note:"麥田花田連綿如畫，沿途尋找 Ken & Mary 樹。",
+       img:IMGS.patchwork, latlng:[43.617, 142.468]},
+
+      {nameJp:"セブンスターの木", nameZh:"七星樹",
+       region:"美瑛町", time:"上午", duration:"20min",
+       type:"sight", typeLabel:"景點",
+       emoji:"⭐", mapQuery:"セブンスターの木 美瑛 北海道",
+       note:"曾出現於七星廣告的柏樹，孤獨佇立田野中。",
+       img:IMGS.sevenstars, latlng:[43.630, 142.452]},
+
+      {nameJp:"白金青い池", nameZh:"白金青池",
+       region:"美瑛町", time:"上午", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"💙", mapQuery:"白金青い池 美瑛 北海道",
+       note:"神秘藍色湖水，水色隨天氣深淺變化。",
+       img:IMGS.bluepond, latlng:[43.565, 142.549]},
+
+      {nameJp:"白金の滝", nameZh:"白金瀑布",
+       region:"美瑛町", time:"上午", duration:"30min",
+       type:"sight", typeLabel:"景點",
+       emoji:"💧", mapQuery:"白金の滝 美瑛 北海道",
+       note:"與青池相鄰，水流湍急，步道清幽。",
+       img:IMGS.shirogane, latlng:[43.558, 142.541]},
+
+      {nameJp:"四季彩の丘", nameZh:"四季彩之丘",
+       region:"美瑛町", time:"下午", duration:"1.5hr",
+       type:"flower", typeLabel:"花田",
+       emoji:"🌈", mapQuery:"四季彩の丘 美瑛 北海道",
+       note:"彩帶花田沿丘綿延，可騎拖拉機穿越，約 ¥500。",
+       img:IMGS.shikisai, latlng:[43.575, 142.458]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 8 · 6月24日 · 富良野 → Outlet → 札幌
+  ──────────────────────────────── */
+  {
+    day:8, date:"6月24日", label:"富良野 → Outlet → 札幌",
+    theme:"購物🛍️ · 市區行街",
+    drive:{route:"富良野 → 北廣島 → 札幌", km:"約165km", time:"約2.75hr"},
+    stops:[
+      {nameJp:"出発・北広島へ", nameZh:"出發 · 前往北廣島",
+       region:"高速公路", time:"10:00", duration:"2.75hr",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"富良野市 北海道",
+       note:"走道央自動車道，約 2 小時 45 分抵達北廣島。",
+       img:IMGS.drive, latlng:[43.347, 142.383]},
+
+      {nameJp:"三井アウトレットパーク 北広島", nameZh:"Mitsui Outlet Park 北廣島",
+       region:"北廣島市", time:"13:00", duration:"3hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🛍️", mapQuery:"三井アウトレットパーク 北広島 北海道",
+       note:"北海道最大 Outlet，品牌齊全，16:30 前出發。",
+       img:IMGS.outlet, latlng:[42.990, 141.558]},
+
+      {nameJp:"札幌中央郵便局", nameZh:"札幌中央郵局 · 寄行李",
+       region:"札幌市", time:"16:30", duration:"45min",
+       type:"sight", typeLabel:"景點",
+       emoji:"📮", mapQuery:"札幌中央郵便局 北海道",
+       note:"札幌站南口旁，將手信及行李寄回，減輕負擔。",
+       img:IMGS.odori, latlng:[43.064, 141.351]},
+
+      {nameJp:"狸小路・大通・最後の買い物", nameZh:"狸小路 · 最後購物",
+       region:"札幌市", time:"晚上", duration:"2hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🌆", mapQuery:"狸小路 札幌 北海道",
+       note:"最後完整購物夜，狸小路藥妝、地下街一網打盡。",
+       img:IMGS.tanukikoji, latlng:[43.058, 141.351]},
+    ]
+  },
+
+  /* ────────────────────────────────
+     Day 9 · 6月25日 · 札幌 → 新千歲 · 回程
+  ──────────────────────────────── */
+  {
+    day:9, date:"6月25日", label:"札幌 → 新千歲 · 回程",
+    theme:"最後購物✈️ · 出發回家",
+    drive:{route:"札幌 → 新千歲機場", km:"約50km", time:"約1hr"},
+    stops:[
+      {nameJp:"出発・新千歳空港へ", nameZh:"出發 · 前往機場",
+       region:"高速公路", time:"10:30", duration:"1hr",
+       type:"drive", typeLabel:"自駕",
+       emoji:"🚗", mapQuery:"札幌市 北海道",
+       note:"早上結帳退房，10:30 出發，約 1 小時車程。",
+       img:IMGS.drive, latlng:[43.062, 141.354]},
+
+      {nameJp:"新千歳空港・返車", nameZh:"還車 · 辦理登機",
+       region:"千歲市", time:"11:30", duration:"1hr",
+       type:"drive", typeLabel:"交通",
+       emoji:"✈️", mapQuery:"新千歳空港 北海道",
+       note:"日産レンタカー 新千歳空港店還車，再辦理 CX581 登機手續。",
+       img:IMGS.chitose, latlng:[42.775, 141.692]},
+
+      {nameJp:"新千歳空港・お土産", nameZh:"新千歲機場 · 最後購物",
+       region:"千歲市", time:"下午", duration:"2hr",
+       type:"shop", typeLabel:"購物",
+       emoji:"🍫", mapQuery:"新千歳空港 ショッピング 北海道",
+       note:"Royce Chocolate World、LeTAO、六花亭、白色戀人，掃貨！",
+       img:IMGS.outlet, latlng:[42.775, 141.690]},
+
+      {nameJp:"離陸・帰宅", nameZh:"CX581 起飛 · 回家！",
+       region:"新千歲機場", time:"16:40", duration:"—",
+       type:"drive", typeLabel:"交通",
+       emoji:"🛫", mapQuery:"新千歳空港 北海道",
+       note:"再見北海道！帶著滿滿回憶，またね！🐱🐕🌸",
+       img:IMGS.departure, latlng:[42.775, 141.694]},
+    ]
+  },
+];
+
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 5：hotelData — 住宿資料
+   ──
+   ── key = Day 號碼（數字），代表該晚入住的住宿
+   ── ⚠️  連住多晚的 Airbnb 只需填入住第一天即可（如 Day2 住兩晚，只填 key:2）
+   ── ⚠️  最後一天回程不需要住宿，直接省略即可（無 key:9）
+   ──
+   ── 📅 要改入住/退房日期  → 改 checkin / checkout
+   ── 🏨 要改酒店名稱       → 改 nameZh（顯示）和 nameJp（搜尋用）
+   ── 🔗 要改預訂連結       → 改 url
+   ── 📍 要改地圖搜尋       → 改 mapQuery
+   ── ➕ 新增一間酒店       → 照格式加一個 key:N 物件
+   ══════════════════════════════════════════════════════════════ */
+const hotelData = {
+  /* Day 1 · 6/17–6/18 · 登別 */
+  1:{
+    nameJp:"ホテルまほろば", nameZh:"登別温泉 Hotel Mahoroba",
+    region:"登別市", checkin:"6/17", checkout:"6/18", nights:1, type:"hotel",
+    url:"https://travel.rakuten.co.jp/HOTEL/12568/12568.html",
+    mapQuery:"ホテルまほろば 登別温泉 北海道", emoji:"🏨",
+    img:IMGS.ryokan, latlng:[42.433, 141.099]
+  },
+
+  /* Day 2 · 6/18–6/20 · 函館（連住兩晚，Day3 不另設） */
+  2:{
+    nameJp:"函館 AirBnb", nameZh:"函館 AirBnb",
+    region:"函館市", checkin:"6/18", checkout:"6/20", nights:2, type:"airbnb",
+    url:"https://www.airbnb.com/rooms/37851494",
+    mapQuery:"函館市 北海道", emoji:"🏠",
+    img:IMGS.hakodate_night, latlng:[41.770, 140.727]
+  },
+
+  /* Day 4 · 6/20–6/21 · 小樽 */
+  4:{
+    nameJp:"Authent Hotel Otaru", nameZh:"歐夏麥酒店 小樽",
+    region:"小樽市", checkin:"6/20", checkout:"6/21", nights:1, type:"hotel",
+    url:"https://www.authent.co.jp/en/concept/",
+    mapQuery:"Authent Hotel Otaru 小樽 北海道", emoji:"🏨",
+    img:IMGS.otaru_canal, latlng:[43.194, 140.996]
+  },
+
+  /* Day 5 · 6/21–6/22 · 札幌 */
+  5:{
+    nameJp:"東急ステイ札幌", nameZh:"東急 Stay 札幌",
+    region:"札幌市", checkin:"6/21", checkout:"6/22", nights:1, type:"hotel",
+    url:"https://travel.rakuten.co.jp/HOTEL/165829/165829.html",
+    mapQuery:"東急ステイ札幌 北海道", emoji:"🏨",
+    img:IMGS.odori, latlng:[43.062, 141.353]
+  },
+
+  /* Day 6 · 6/22–6/24 · 富良野（連住兩晚，Day7 不另設） */
+  6:{
+    nameJp:"富良野 AirBnb", nameZh:"富良野 AirBnb",
+    region:"富良野市", checkin:"6/22", checkout:"6/24", nights:2, type:"airbnb",
+    url:"https://www.airbnb.com/rooms/33724767",
+    mapQuery:"富良野市 北海道", emoji:"🏠",
+    img:IMGS.furano_field, latlng:[43.347, 142.376]
+  },
+
+  /* Day 8 · 6/24–6/25 · 札幌 */
+  8:{
+    nameJp:"札幌ビューホテル大通公園", nameZh:"札幌 View Hotel 大通公園",
+    region:"札幌市", checkin:"6/24", checkout:"6/25", nights:1, type:"hotel",
+    url:"https://travel.rakuten.co.jp/HOTEL/1430/1430.html",
+    mapQuery:"札幌ビューホテル大通公園 北海道", emoji:"🏨",
+    img:IMGS.odori, latlng:[43.061, 141.350]
+  },
+};
+
+
+/* ══════════════════════════════════════════════════════════════
+   📌 SECTION 6：restaurantData — 餐廳資料（暫時留空）
+   ──
+   ── ➕ 新增餐廳 → 在陣列內加一個 {} 物件，格式參考下方範本
+   ──
+   ── 每個餐廳物件欄位說明：
+   ──   nameZh    → 餐廳中文名稱
+   ──   nameJp    → 餐廳日文名稱
+   ──   region    → 所在地區
+   ──   day       → 對應第幾天（數字）
+   ──   meal      → 餐別："breakfast" / "lunch" / "dinner"
+   ──   type      → 料理類型（如 "ramen" / "sushi" / "bbq"）
+   ──   price     → 預算（如 "¥1,500–2,500"）
+   ──   note      → 備註
+   ──   mapQuery  → Google Map 搜尋關鍵字
+   ──   img       → 圖片（使用 IMGS.xxx 或直接填 URL）
+   ══════════════════════════════════════════════════════════════ */
+const restaurantData = [
+
+  /* ══════════ Day 1 · 6月17日 · 登別 ══════════ */
+  /* ══════════ Day 1 · 6月17日 · 登別 ══════════ */
+  {nameJp:"Matsumae - Noboribetsu Grand Hotel",
+   nameZh:"登別格蘭大酒店 Matsumae",
+   region:"登別市", day:1, meal:"lunch", type:"restaurant",
+   emoji:"🍱", price:"¥1,500–2,500", alt:false,
+   note:"抵達登別後的第一餐，以北海道食材為主的酒店餐廳，位置方便，無需另找餐廳。",
+   mapQuery:"Matsumae Noboribetsu Grand Hotel 北海道",
+   latlng:[42.428, 141.107], img:IMGS.onsen},
+
+  {nameJp:"ホテルまほろば 夕食",
+   nameZh:"Hotel Mahoroba · 旅館晚餐",
+   region:"登別市", day:1, meal:"dinner", type:"ryokan",
+   emoji:"♨️", price:"住宿含", alt:false,
+   note:"旅館晚餐享用北海道山珍海味懷石料理，溫泉旅館的特色體驗，無需外出。",
+   mapQuery:"ホテルまほろば 登別温泉 北海道",
+   latlng:[42.433, 141.099], img:IMGS.ryokan},
+
+  /* ══════════ Day 2 · 6月18日 · 登別 → 函館 ══════════ */
+  {nameJp:"ホテルまほろば 朝食",
+   nameZh:"Hotel Mahoroba · 旅館早餐",
+   region:"登別市", day:2, meal:"breakfast", type:"ryokan",
+   emoji:"🍳", price:"住宿含", alt:false,
+   note:"08:30 旅館內享用豐盛和洋式自助早餐，09:30 出發前往函館。",
+   mapQuery:"ホテルまほろば 登別温泉 北海道",
+   latlng:[42.433, 141.099], img:IMGS.ryokan},
+
+  {nameJp:"スープカレー Begirama",
+   nameZh:"Soup Curry Begirama",
+   region:"函館市", day:2, meal:"lunch", type:"curry",
+   emoji:"🍛", price:"¥1,000–1,500", alt:false,
+   note:"函館人氣湯咖哩店，香料湯底濃郁，蔬菜豐富，抵達函館後的第一餐。",
+   mapQuery:"スープカレー Begirama 函館 北海道",
+   latlng:[41.772, 140.726], img:IMGS.kanemori},
+
+  {nameJp:"ラーメン専科 笑てん",
+   nameZh:"笑てん · 函館鹽拉麵",
+   region:"函館市", day:2, meal:"dinner", type:"ramen",
+   emoji:"🍜", price:"¥800–1,200", alt:true, altLabel:"或",
+   note:"函館鹽味拉麵名店，清湯鮮美，夜景過後宵夜首選。",
+   mapQuery:"ラーメン専科笑てん 函館 北海道",
+   latlng:[41.772, 140.724], img:IMGS.hakodate_night},
+
+  {nameJp:"はこだて塩らーめん しなの",
+   nameZh:"しなの · 函館鹽拉麵",
+   region:"函館市", day:2, meal:"dinner", type:"ramen",
+   emoji:"🍜", price:"¥800–1,200", alt:true, altLabel:"或",
+   note:"另一家函館鹽拉麵名店，清淡鮮甜，與笑てん二選一，同樣值得一試。",
+   mapQuery:"はこだて塩らーめん しなの 函館 北海道",
+   latlng:[41.770, 140.725], img:IMGS.hakodate_night},
+
+  /* ══════════ Day 3 · 6月19日 · 函館 Relax Day ══════════ */
+  {nameJp:"函館朝市",
+   nameZh:"函館朝市 · 早餐",
+   region:"函館市", day:3, meal:"breakfast", type:"market",
+   emoji:"🎪", price:"¥800–1,500", alt:false,
+   note:"每日 06:00 開始，海鮮丼、鮭魚子丼現點現做，新鮮豐盛，朝市氣氛熱鬧。",
+   mapQuery:"函館朝市 北海道",
+   latlng:[41.775, 140.729], img:IMGS.asaichi},
+
+  {nameJp:"回転寿司 根室花まる キラリス函館店",
+   nameZh:"根室花まる · 迴轉壽司",
+   region:"函館市", day:3, meal:"lunch", type:"sushi",
+   emoji:"🍣", price:"¥1,500–2,500", alt:false,
+   note:"北海道知名迴轉壽司，海膽、帆立、鮭魚子皆優，函館店位於 KIRARIS 內，需排隊。",
+   mapQuery:"回転寿司 根室花まる キラリス函館店 北海道",
+   latlng:[41.775, 140.726], img:IMGS.asaichi},
+
+  {nameJp:"はこだて ひかりの屋台 大門横丁",
+   nameZh:"大門橫丁 · 居酒屋晚餐",
+   region:"函館市", day:3, meal:"dinner", type:"izakaya",
+   emoji:"🏮", price:"¥2,000–3,500", alt:false,
+   note:"函館屋台橫丁，多間小居酒屋連排，氣氛熱鬧溫暖，點海鮮下酒最合適，備外套。",
+   mapQuery:"はこだて ひかりの屋台 大門横丁",
+   latlng:[41.769, 140.723], img:IMGS.hakodate_night},
+
+  /* ══════════ Day 4 · 6月20日 · 函館 → 小樽 ══════════ */
+  {nameJp:"かなや 長万部本店",
+   nameZh:"かなや · 長萬部蟹飯",
+   region:"長萬部町", day:4, meal:"lunch", type:"seafood",
+   emoji:"🦀", price:"¥1,200–2,000", alt:false,
+   note:"北海道長萬部著名蟹飯，招牌かにめし必點，配蟹湯絕配，中途站必食不可錯過。",
+   mapQuery:"かなや 長万部 北海道",
+   latlng:[42.543, 140.381], img:IMGS.crab},
+
+  {nameJp:"うに専門店世壱屋 小樽運河店",
+   nameZh:"世壱屋 · 小樽海膽丼",
+   region:"小樽市", day:4, meal:"dinner", type:"seafood",
+   emoji:"🦔", price:"¥3,000–5,000", alt:true, altLabel:"或",
+   note:"小樽運河旁海膽專門店，各款海膽丼豐盛鮮甜，是小樽最值得一試的晚餐選擇。",
+   mapQuery:"うに専門店世壱屋 小樽運河店 北海道",
+   latlng:[43.195, 140.993], img:IMGS.otaru_canal},
+
+  {nameJp:"おたる政寿司 本店",
+   nameZh:"政壽司 · 小樽老舖壽司",
+   region:"小樽市", day:4, meal:"dinner", type:"sushi",
+   emoji:"🍣", price:"¥3,000–6,000", alt:true, altLabel:"或",
+   note:"小樽百年老舖壽司名店，食材新鮮時令，與世壱屋二選一，可按預算決定。",
+   mapQuery:"おたる政寿司 本店 小樽 北海道",
+   latlng:[43.193, 140.994], img:IMGS.otaru_canal},
+
+  /* ══════════ Day 5 · 6月21日 · 小樽 → 札幌 ══════════ */
+  {nameJp:"うに専門店 世壱屋 札幌南二条店",
+   nameZh:"世壱屋 · 札幌海膽丼",
+   region:"札幌市", day:5, meal:"lunch", type:"seafood",
+   emoji:"🦔", price:"¥3,000–5,000", alt:false,
+   note:"札幌海膽專門店，中午人較少，可好好享用鮮甜北海道海膽丼，是本次旅程海膽體驗之一。",
+   mapQuery:"うに専門店 世壱屋 札幌南二条店 北海道",
+   latlng:[43.057, 141.351], img:IMGS.odori},
+
+  {nameJp:"SOUP CURRY KING",
+   nameZh:"Soup Curry King · 晚餐",
+   region:"札幌市", day:5, meal:"dinner", type:"curry",
+   emoji:"🍛", price:"¥1,200–1,800", alt:false,
+   note:"札幌人氣湯咖哩名店，香料湯底濃郁，雞腿咖哩必點，辣度可調，排隊名店早到為佳。",
+   mapQuery:"SOUP CURRY KING 札幌 北海道",
+   latlng:[43.059, 141.352], img:IMGS.odori},
+
+  {nameJp:"パフェ、珈琲、酒、佐藤堂本店",
+   nameZh:"佐藤堂 · 宵夜芭菲",
+   region:"札幌市", day:5, meal:"cafe", type:"cafe",
+   emoji:"🍨", price:"¥800–1,500", alt:false,
+   note:"札幌人氣深夜芭菲店，精緻水果芭菲配精品咖啡，宵夜必試，氣氛優雅迷人。",
+   mapQuery:"パフェ 珈琲 酒 佐藤堂本店 札幌",
+   latlng:[43.056, 141.352], img:IMGS.tanukikoji},
+
+  /* ══════════ Day 6 · 6月22日 · 二條市場 → 富良野 ══════════ */
+  {nameJp:"札幌二条市場",
+   nameZh:"二條市場 · 早餐海鮮丼",
+   region:"札幌市", day:6, meal:"breakfast", type:"market",
+   emoji:"🦑", price:"¥1,500–2,500", alt:false,
+   note:"道地早市，海膽蟹肉丼早餐首選，比函館朝市更在地，之後出發前往富良野。",
+   mapQuery:"札幌二条市場 北海道",
+   latlng:[43.060, 141.354], img:IMGS.asaichi},
+
+  {nameJp:"富川製麺所 日の出店",
+   nameZh:"富川製麵所 · 富良野在地麵",
+   region:"富良野市", day:6, meal:"lunch", type:"ramen",
+   emoji:"🍜", price:"¥800–1,200", alt:false,
+   note:"富良野在地製麵店，使用本地食材製麵，簡樸味道出色，抵達富良野後的第一餐。",
+   mapQuery:"富川製麺所 日の出店 富良野 北海道",
+   latlng:[43.345, 142.383], img:IMGS.furano_field},
+
+  {nameJp:"まんぐう (Mangoo)",
+   nameZh:"まんぐう · 富良野居酒屋",
+   region:"富良野市", day:6, meal:"dinner", type:"restaurant",
+   emoji:"🍶", price:"¥1,500–2,500", alt:false,
+   note:"富良野在地居酒屋風格餐廳，使用富良野野菜及北海道食材，花田一天後的輕鬆晚餐。",
+   mapQuery:"まんぐう Mangoo 富良野 北海道",
+   latlng:[43.344, 142.380], img:IMGS.furano_field},
+
+  /* ══════════ Day 7 · 6月23日 · 富良野 + 美瑛 ══════════ */
+  {nameJp:"Blanc Rouge",
+   nameZh:"Blanc Rouge · 美瑛法式",
+   region:"美瑛町", day:7, meal:"lunch", type:"restaurant",
+   emoji:"🥗", price:"¥1,500–2,500", alt:false,
+   note:"美瑛人氣西式料理，使用當地食材烹調，環境優雅，窗外是丘陵農田，建議預訂。",
+   mapQuery:"Blanc Rouge 美瑛 北海道",
+   latlng:[43.590, 142.468], img:IMGS.patchwork},
+
+  {nameJp:"カンパーナ六花亭",
+   nameZh:"カンパーナ六花亭 · 下午茶",
+   region:"美瑛町", day:7, meal:"cafe", type:"cafe",
+   emoji:"🧁", price:"¥600–1,200", alt:false,
+   note:"六花亭美瑛店，落地窗外是連綿丘陵花田，邊喝咖啡邊賞景，最療癒的美瑛下午茶。",
+   mapQuery:"カンパーナ六花亭 美瑛 北海道",
+   latlng:[43.576, 142.474], img:IMGS.shikisai},
+
+  {nameJp:"やきとり工房 にくまる",
+   nameZh:"にくまる · 富良野燒鳥",
+   region:"富良野市", day:7, meal:"dinner", type:"yakitori",
+   emoji:"🍢", price:"¥1,500–2,500", alt:false,
+   note:"富良野燒鳥名店，北海道雞肉鮮嫩，配合本地啤酒最舒暢，花田美瑛一天後的完美晚餐。",
+   mapQuery:"やきとり工房 にくまる 富良野 北海道",
+   latlng:[43.343, 142.381], img:IMGS.ningle},
+
+  /* ══════════ Day 8 · 6月24日 · 富良野 → 札幌 ══════════ */
+  {nameJp:"三井アウトレットパーク内 各レストラン",
+   nameZh:"Outlet 內餐廳 · 午餐",
+   region:"北廣島市", day:8, meal:"lunch", type:"restaurant",
+   emoji:"🛍️", price:"¥1,000–2,000", alt:false,
+   note:"Mitsui Outlet Park 北廣島內有多間餐廳，邊購物邊解決午餐，選擇按口味即興決定。",
+   mapQuery:"三井アウトレットパーク 北広島 北海道",
+   latlng:[42.990, 141.558], img:IMGS.outlet},
+
+  {nameJp:"ジンギスカン 札幌",
+   nameZh:"成吉思汗 · 烤羊晚餐",
+   region:"札幌市", day:8, meal:"dinner", type:"bbq",
+   emoji:"🐑", price:"¥2,500–3,500", alt:false,
+   note:"札幌名物成吉思汗烤羊，北海道羊肉鮮嫩無羶味，旅程最後一個大餐，值得期待！",
+   mapQuery:"ジンギスカン 札幌 北海道",
+   latlng:[43.058, 141.349], img:IMGS.tanukikoji},
+
+  /* ══════════ Day 9 · 6月25日 · 新千歲機場 ══════════ */
+  {nameJp:"新千歳空港 拉麺道場 / 寿司 / スープカレー",
+   nameZh:"機場最後一餐 · 拉麵 / 壽司 / 咖哩",
+   region:"千歲市", day:9, meal:"lunch", type:"airport",
+   emoji:"✈️", price:"¥1,000–2,000", alt:false,
+   note:"機場 3F 拉麵道場、壽司、Soup Curry 三選一，旅程最後一餐好好享用，帶著飽足感回家！",
+   mapQuery:"新千歳空港 拉麺道場 北海道",
+   latlng:[42.775, 141.690], img:IMGS.chitose},
+];
+
+/* ═══════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════ */
+const TYPE_TAG = {
+  sight:"tag-sight", shop:"tag-shop", onsen:"tag-onsen",
+  drive:"tag-drive", night:"tag-night", port:"tag-port", flower:"tag-flower"
+};
+const MEAL_LABEL  = {breakfast:"早餐", lunch:"午餐", dinner:"晚餐", cafe:"下午茶"};
+const MEAL_EMOJI  = {breakfast:"🌅",   lunch:"☀️",   dinner:"🌙",   cafe:"☕"};
+const MEAL_CLS    = {breakfast:"breakfast", lunch:"lunch", dinner:"dinner", cafe:"cafe"};
+const REST_TYPE_CLASS = {
+  ramen:"rtag-ramen", sushi:"rtag-sushi", seafood:"rtag-seafood",
+  curry:"rtag-curry", izakaya:"rtag-izakaya", bbq:"rtag-bbq",
+  yakitori:"rtag-yakitori", market:"rtag-market", ryokan:"rtag-ryokan",
+  restaurant:"rtag-restaurant", cafe:"rtag-cafe", airport:"rtag-airport"
+};
+const REST_TYPE_LABEL = {
+  ramen:"拉麵", sushi:"壽司", seafood:"海鮮", curry:"湯咖哩",
+  izakaya:"居酒屋", bbq:"燒肉", yakitori:"燒鳥", market:"市場",
+  ryokan:"旅館料理", restaurant:"餐廳", cafe:"甜品 Café", airport:"機場餐廳"
+};
+function mapUrl(q){ return "https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(q) }
+function navUrl(ll){ return `https://www.google.com/maps/dir/?api=1&destination=${ll[0]},${ll[1]}` }
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let curDay = 0, curCard = 0, curMode = "stops", transitioning = false;
+let leafletMarkersStop = [], leafletMarkersLayer = [];  // two marker layers
+
+/* ═══════════════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════════════ */
+function buildTabs(){
+  const el = document.getElementById("tabsScroll");
+  itineraryData.forEach((d,i)=>{
+    const t = document.createElement("div");
+    t.className = "day-tab" + (i===0?" active":"");
+    t.innerHTML = `<span class="dt-l">DAY</span><span class="dt-n">${d.day}</span><div class="dt-d"></div>`;
+    t.onclick = ()=> switchDay(i);
+    el.appendChild(t);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   SWITCH DAY
+═══════════════════════════════════════════════════ */
+function switchDay(idx){
+  if(idx===curDay && document.getElementById("cardTrack").children.length) return;
+  if(transitioning) return;
+  transitioning = true;
+
+  const fade = document.getElementById("mapFade");
+  fade.style.transition = "opacity .18s ease";
+  fade.classList.add("on");
+
+  setTimeout(()=>{
+    curDay = idx; curCard = 0;
+    document.querySelectorAll(".day-tab").forEach((t,i)=>t.classList.toggle("active",i===idx));
+    document.querySelectorAll(".day-tab")[idx].scrollIntoView({behavior:"smooth",block:"nearest",inline:"center"});
+
+    const d = itineraryData[idx];
+    const mpT = document.getElementById("mpTitle");
+    const mpR = document.getElementById("mpRoute");
+    const mpD = document.getElementById("mpDrive");
+    if(mpT) mpT.textContent = `Day ${d.day} · ${d.date} · ${d.label}`;
+    if(mpR) mpR.textContent = `🚗 ${d.drive.route}`;
+    if(mpD) mpD.textContent = `⏱ ${d.drive.time}`;
+
+    initMap(idx);
+    renderDayLayer();   // renders markers + cards for current mode
+
+    setTimeout(()=>{
+      fade.style.transition = "opacity .26s ease";
+      fade.classList.remove("on");
+      setTimeout(()=>{ transitioning=false; }, 280);
+    }, 80);
+  }, 200);
+}
+
+/* ═══════════════════════════════════════════════════
+   MODE SWITCH — the heart of new UX
+═══════════════════════════════════════════════════ */
+function switchMode(mode){
+  if(mode === curMode) return;
+  curMode = mode;
+  curCard = 0;
+
+  // Update mode bar pills
+  document.querySelectorAll(".mode-pill").forEach(p=>{
+    p.classList.toggle("active", p.dataset.mode === mode);
+  });
+
+  renderDayLayer();
+}
+
+/* ─── Master render dispatcher ─── */
+function renderDayLayer(){
+  clearLayer();
+  if(curMode === "stops") renderStopsLayer();
+  if(curMode === "food")  renderFoodLayer();
+  if(curMode === "hotel") renderHotelLayer();
+}
+
+/* ═══════════════════════════════════════════════════
+   MARKER LAYER HELPERS
+═══════════════════════════════════════════════════ */
+function clearLayer(){
+  leafletMarkersLayer.forEach(m=>{ if(map) map.removeLayer(m); });
+  leafletMarkersLayer = [];
+  // Also clear route
+  if(window._routeGlow){ map.removeLayer(window._routeGlow); window._routeGlow=null; }
+  if(window._routeLine){ map.removeLayer(window._routeLine); window._routeLine=null; }
+}
+
+function makePin(emoji, pinType, delayMs, floatDelay, label){
+  const lbl = label.split('·')[0].trim().substring(0,8);
+  return L.divIcon({
+    className:"",
+    iconSize:[32,58], iconAnchor:[16,58],
+    html:`<div class="cpin pt-${pinType}" style="animation-delay:${delayMs}ms">
+      <div class="cpin-orb" style="animation-delay:${floatDelay}s">${emoji}</div>
+      <div class="cpin-stem"></div>
+      <div class="cpin-lbl">${lbl}</div>
+    </div>`
+  });
+}
+
+function setActivePin(idx){
+  leafletMarkersLayer.forEach((m,i)=>{
+    const el = m.getElement(); if(!el) return;
+    const pin = el.querySelector(".cpin"); if(!pin) return;
+    pin.classList.toggle("active", i===idx);
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYER A: STOPS (景點)
+═══════════════════════════════════════════════════ */
+function renderStopsLayer(){
+  const d = itineraryData[curDay];
+
+  // Route polyline
+  const pts = d.stops.filter(s=>s.latlng).map(s=>s.latlng);
+  if(pts.length >= 2){
+    window._routeGlow = L.polyline(pts,{color:"rgba(93,157,184,.16)",weight:8,smoothFactor:2,interactive:false}).addTo(map);
+    window._routeLine = L.polyline(pts,{color:"rgba(93,157,184,.62)",weight:2.5,dashArray:"7,5",lineCap:"round",smoothFactor:1.5,interactive:false}).addTo(map);
+  }
+
+  // Markers
+  d.stops.forEach((s,i)=>{
+    if(!s.latlng) return;
+    const icon = makePin(s.emoji, s.type, 40+i*55, -(i*0.8), s.nameZh);
+    const m = L.marker(s.latlng,{icon, zIndexOffset:i===0?1000:0})
+      .addTo(map).on("click",()=>jumpToCard(i));
+    leafletMarkersLayer.push(m);
+  });
+  setActivePin(0);
+
+  // Cards
+  renderCards_stops(d);
+}
+
+function renderCards_stops(d){
+  const track = document.getElementById("cardTrack");
+  const dots  = document.getElementById("cardDots");
+  track.innerHTML = ""; dots.innerHTML = "";
+
+  d.stops.forEach((s,i)=>{
+    const tagCls = TYPE_TAG[s.type]||"tag-sight";
+    const mq = s.mapQuery||(s.nameJp+" 北海道");
+    const card = document.createElement("div");
+    card.className = "stop-card"+(i===0?" active-card":"");
+    card.dataset.idx = i;
+    card.style.animationDelay = (.04+i*.05)+"s";
+    card.innerHTML = `
+      <div class="sc-img">
+        <img src="${s.img}" alt="${s.nameZh}" loading="lazy" decoding="async"
+             onerror="this.parentElement.style.background='var(--azure-s)';this.style.display='none'"/>
+        <div class="sc-badge">${s.typeLabel}</div>
+        <div class="sc-time">${s.time}</div>
+      </div>
+      <div class="sc-body">
+        <div class="sc-titles">
+          <div class="sc-name-jp">${s.nameJp}</div>
+          <div class="sc-name-zh">${s.nameZh}</div>
+        </div>
+        <div class="sc-meta">
+          <span class="sc-tag tag-loc">📍 ${s.region}</span>
+          <span class="sc-tag tag-dur">⏱ ${s.duration}</span>
+          <span class="sc-tag ${tagCls}">${s.typeLabel}</span>
+        </div>
+        <div class="sc-note">${s.note}</div>
+        <div class="sc-btns">
+          <a class="sc-btn map" href="${mapUrl(mq)}" target="_blank">📍 Map</a>
+          ${s.latlng?`<a class="sc-btn" href="${navUrl(s.latlng)}" target="_blank">🧭 導航</a>`:''}
+        </div>
+      </div>`;
+    card.onclick = ()=> jumpToCard(i);
+    track.appendChild(card);
+
+    const dot = document.createElement("div");
+    dot.className = "cdot"+(i===0?" on":"");
+    dots.appendChild(dot);
+  });
+
+  track.addEventListener("scroll", onTrackScroll, {passive:true});
+  track.scrollLeft = 0;
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYER B: FOOD (餐廳)
+═══════════════════════════════════════════════════ */
+function renderFoodLayer(){
+  const dayNum = curDay + 1;
+  const dayRests = restaurantData.filter(r=>r.day===dayNum);
+  const mealOrder = {breakfast:0, lunch:1, cafe:2, dinner:3};
+  const sorted = [...dayRests].sort((a,b)=>(mealOrder[a.meal]??9)-(mealOrder[b.meal]??9));
+
+  // Markers — unique positions only (deduplicate alt options)
+  const seen = new Set();
+  sorted.forEach((r,i)=>{
+    if(!r.latlng) return;
+    const key = r.latlng.join(',');
+    if(seen.has(key)) return;
+    seen.add(key);
+    const icon = makePin(r.emoji||"🍽", "food", 40+i*50, -(i*0.6), r.nameZh);
+    const m = L.marker(r.latlng,{icon, zIndexOffset:500+i})
+      .addTo(map)
+      .on("click",()=>{ jumpToCard(sorted.indexOf(r)); });
+    leafletMarkersLayer.push(m);
+  });
+
+  renderCards_food(sorted);
+}
+
+function renderCards_food(sorted){
+  const track = document.getElementById("cardTrack");
+  const dots  = document.getElementById("cardDots");
+  track.innerHTML = ""; dots.innerHTML = "";
+
+  // Group alts
+  let cardList = []; // flat list of rendered card items
+  let i=0;
+  while(i<sorted.length){
+    const r = sorted[i];
+    if(r.alt){
+      const grp=[r]; let j=i+1;
+      while(j<sorted.length && sorted[j].alt && sorted[j].meal===r.meal){ grp.push(sorted[j]); j++; }
+      cardList.push({type:"altgroup", items:grp});
+      i=j;
+    } else {
+      cardList.push({type:"single", item:r});
+      i++;
+    }
+  }
+
+  if(cardList.length===0){
+    const card = document.createElement("div");
+    card.className = "stop-card active-card";
+    card.innerHTML = `<div class="sc-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;gap:10px">
+      <div style="font-size:36px">🍱</div>
+      <div style="font-size:13px;color:var(--ink-soft);font-family:'Noto Serif JP',serif;text-align:center">本日餐廳資料即將加入</div>
+    </div>`;
+    track.appendChild(card);
+    return;
+  }
+
+  cardList.forEach((entry,ci)=>{
+    const isFirst = ci===0;
+    if(entry.type==="single"){
+      track.appendChild(buildFoodCard(entry.item, isFirst, null));
+    } else {
+      // Alt group: one card with internal toggle
+      track.appendChild(buildAltGroupCard(entry.items, isFirst));
+    }
+    const dot = document.createElement("div");
+    dot.className = "cdot"+(isFirst?" on":"");
+    dots.appendChild(dot);
+  });
+
+  track.addEventListener("scroll", onTrackScroll, {passive:true});
+  track.scrollLeft = 0;
+}
+
+function buildFoodCard(r, isActive, altOf){
+  const mq = r.mapQuery||(r.nameJp+" 北海道");
+  const typeCls = REST_TYPE_CLASS[r.type]||"rtag-restaurant";
+  const typeLabel = REST_TYPE_LABEL[r.type]||r.type;
+  const mealLabel = MEAL_LABEL[r.meal]||r.meal;
+  const mealEmo   = MEAL_EMOJI[r.meal]||"🍴";
+  const mealCls   = MEAL_CLS[r.meal]||"";
+
+  const card = document.createElement("div");
+  card.className = "stop-card"+(isActive?" active-card":"");
+
+  card.innerHTML = `
+    <div class="sc-img">
+      <img src="${r.img||''}" alt="${r.nameZh}" loading="lazy" decoding="async"
+           onerror="this.parentElement.style.background='var(--sand-s)';this.style.display='none'"/>
+      <div class="sc-badge rc-meal-badge ${mealCls}">${mealEmo} ${mealLabel}</div>
+      <div class="sc-time" style="font-size:9px">${r.price||''}</div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-titles">
+        <div class="sc-name-jp">${r.nameJp}</div>
+        <div class="sc-name-zh">${r.nameZh}</div>
+      </div>
+      <div class="sc-meta">
+        <span class="sc-tag tag-loc">📍 ${r.region}</span>
+        <span class="sc-tag ${typeCls}">${typeLabel}</span>
+      </div>
+      <div class="sc-note">${r.note}</div>
+      <div class="sc-btns">
+        <a class="sc-btn map" href="${mapUrl(mq)}" target="_blank">📍 Map</a>
+        ${r.latlng?`<a class="sc-btn" href="${navUrl(r.latlng)}" target="_blank">🧭 導航</a>`:''}
+      </div>
+    </div>`;
+
+  card.onclick = (e)=>{
+    if(e.target.tagName==="A") return;
+    const idx = Array.from(document.getElementById("cardTrack").children).indexOf(card);
+    jumpToCard(idx);
+    // Pan to this restaurant on map
+    if(r.latlng && map) map.panTo(r.latlng,{animate:true,duration:.5});
+  };
+  return card;
+}
+
+function buildAltGroupCard(items, isActive){
+  // Single card with two options shown inline
+  const mealLabel = MEAL_LABEL[items[0].meal]||"";
+  const mealEmo   = MEAL_EMOJI[items[0].meal]||"🍴";
+  const mealCls   = MEAL_CLS[items[0].meal]||"";
+
+  const card = document.createElement("div");
+  card.className = "stop-card"+(isActive?" active-card":"");
+
+  // Build the inner alt options HTML
+  let optsHtml = items.map((r,ri)=>{
+    const mq = r.mapQuery||(r.nameJp+" 北海道");
+    const typeCls = REST_TYPE_CLASS[r.type]||"rtag-restaurant";
+    const typeLabel = REST_TYPE_LABEL[r.type]||r.type;
+    return `
+    <div class="alt-opt${ri===0?" alt-opt-active":""}" data-idx="${ri}" style="padding:10px 14px${ri>0?';border-top:1px solid rgba(190,178,162,.10)':''}">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+        <div>
+          <div style="font-size:11.5px;font-weight:600;color:var(--ink);font-family:'Noto Serif JP',serif">${r.emoji||''} ${r.nameZh}</div>
+          <div style="font-size:9px;color:var(--ink-soft);margin-top:1px">${r.nameJp}</div>
+        </div>
+        <div style="font-size:9px;color:var(--ink-soft);white-space:nowrap;margin-left:6px">${r.price||''}</div>
+      </div>
+      <div style="display:flex;gap:4px;margin-bottom:5px;flex-wrap:wrap">
+        <span class="sc-tag tag-loc">📍 ${r.region}</span>
+        <span class="sc-tag ${typeCls}">${typeLabel}</span>
+      </div>
+      <div style="font-size:10px;color:var(--ink-mid);line-height:1.55;font-weight:300;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px">${r.note}</div>
+      <div style="display:flex;gap:6px">
+        <a class="sc-btn map" href="${mapUrl(mq)}" target="_blank">📍 Map</a>
+        ${r.latlng?`<a class="sc-btn" href="${navUrl(r.latlng)}" target="_blank">🧭 導航</a>`:''}
+      </div>
+    </div>`;
+  }).join(`<div style="display:flex;align-items:center;gap:8px;padding:0 14px"><div style="flex:1;height:1px;background:rgba(190,178,162,.15)"></div><div style="font-size:8.5px;color:var(--ink-xs);font-family:'Noto Serif JP',serif;letter-spacing:.5px">或</div><div style="flex:1;height:1px;background:rgba(190,178,162,.15)"></div></div>`);
+
+  card.innerHTML = `
+    <div class="sc-img">
+      <img src="${items[0].img||''}" alt="${items[0].nameZh}" loading="lazy" decoding="async"
+           onerror="this.parentElement.style.background='var(--sand-s)';this.style.display='none'"/>
+      <div class="sc-badge rc-meal-badge ${mealCls}">${mealEmo} ${mealLabel} · 二選一</div>
+    </div>
+    <div style="overflow:hidden">${optsHtml}</div>`;
+
+  card.onclick = (e)=>{
+    if(e.target.tagName==="A") return;
+    const idx = Array.from(document.getElementById("cardTrack").children).indexOf(card);
+    jumpToCard(idx);
+    if(items[0].latlng && map) map.panTo(items[0].latlng,{animate:true,duration:.5});
+  };
+  return card;
+}
+
+/* ═══════════════════════════════════════════════════
+   LAYER C: HOTEL (住宿)
+═══════════════════════════════════════════════════ */
+function renderHotelLayer(){
+  const dayNum = curDay + 1;
+
+  // Find hotel covering this day
+  let h = null;
+  Object.entries(hotelData).forEach(([dk, hh])=>{
+    if(!hh) return;
+    if(dayNum >= +dk && dayNum < +dk + hh.nights) h = hh;
+  });
+
+  // Marker
+  if(h && h.latlng){
+    const icon = makePin(h.emoji, "hotel", 40, 0, h.nameZh);
+    const m = L.marker(h.latlng,{icon, zIndexOffset:800}).addTo(map);
+    leafletMarkersLayer.push(m);
+    setActivePin(0);
+  }
+
+  renderCards_hotel(h, dayNum);
+}
+
+function renderCards_hotel(h, dayNum){
+  const track = document.getElementById("cardTrack");
+  const dots  = document.getElementById("cardDots");
+  track.innerHTML = ""; dots.innerHTML = "";
+  dots.innerHTML = '<div class="cdot on" style="width:14px"></div>';
+
+  const card = document.createElement("div");
+  card.className = "stop-card active-card";
+
+  if(!h){
+    card.innerHTML = `<div class="sc-body" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:200px;gap:10px">
+      <div style="font-size:36px">✈️</div>
+      <div style="font-size:13px;color:var(--ink-soft);font-family:'Noto Serif JP',serif;text-align:center">回程日<br>本日無住宿</div>
+    </div>`;
+    track.appendChild(card);
+    return;
+  }
+
+  const isAB = h.type==="airbnb";
+  card.innerHTML = `
+    <div class="sc-img">
+      <img src="${h.img||''}" alt="${h.nameZh}" loading="lazy" decoding="async"
+           onerror="this.parentElement.style.background='var(--lav-s)';this.style.display='none'"/>
+      <div class="sc-badge">${isAB?"🏠 AirBnb":"🏨 酒店"}</div>
+      <div class="sc-time">${h.nights}泊</div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-titles">
+        <div class="sc-name-jp">${h.nameJp}</div>
+        <div class="sc-name-zh">${h.nameZh}</div>
+      </div>
+      <div class="sc-meta">
+        <span class="sc-tag tag-loc">📍 ${h.region}</span>
+        <span class="sc-tag tag-dur">📅 ${h.checkin} → ${h.checkout}</span>
+      </div>
+      <div class="sc-note">入住 ${h.checkin} · 退房 ${h.checkout} · ${h.nights}泊</div>
+      <div class="sc-btns">
+        <a class="sc-btn map" href="${h.url}" target="_blank">🔗 預訂</a>
+        <a class="sc-btn" href="${mapUrl(h.mapQuery)}" target="_blank">📍 Map</a>
+        ${h.latlng?`<a class="sc-btn" href="${navUrl(h.latlng)}" target="_blank">🧭 導航</a>`:''}
+      </div>
+    </div>`;
+
+  card.onclick = (e)=>{
+    if(e.target.tagName==="A") return;
+    if(h.latlng && map) map.panTo(h.latlng,{animate:true,duration:.5});
+  };
+  track.appendChild(card);
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLL / CARD SYNC
+═══════════════════════════════════════════════════ */
+function onTrackScroll(){
+  const track = document.getElementById("cardTrack");
+  const cards = track.querySelectorAll(".stop-card");
+  if(!cards.length) return;
+  const cw = cards[0].offsetWidth + 10;
+  const idx = Math.round(track.scrollLeft / cw);
+  if(idx !== curCard){ curCard=idx; onCardChange(idx); }
+}
+
+function onCardChange(idx){
+  document.querySelectorAll(".stop-card").forEach((c,i)=>c.classList.toggle("active-card",i===idx));
+  document.querySelectorAll(".cdot").forEach((d,i)=>d.classList.toggle("on",i===idx));
+
+  if(curMode==="stops"){
+    setActivePin(idx);
+    const s = itineraryData[curDay].stops[idx];
+    if(s && s.latlng && map) map.panTo(s.latlng,{animate:true,duration:.5,easeLinearity:.4});
+  }
+  if(curMode==="food"){
+    // Find restaurant for this card
+    const dayNum = curDay+1;
+    const mealOrder = {breakfast:0,lunch:1,cafe:2,dinner:3};
+    const sorted = restaurantData.filter(r=>r.day===dayNum)
+      .sort((a,b)=>(mealOrder[a.meal]??9)-(mealOrder[b.meal]??9));
+    let flatIdx=0, ci=0;
+    // Build same card-list structure
+    while(ci<sorted.length){
+      if(ci===idx){ break; }
+      if(sorted[ci].alt){
+        let j=ci+1;
+        while(j<sorted.length&&sorted[j].alt&&sorted[j].meal===sorted[ci].meal)j++;
+        ci=j;
+      } else ci++;
+      flatIdx=ci;
+    }
+    const r = sorted[ci];
+    if(r && r.latlng && map) map.panTo(r.latlng,{animate:true,duration:.5});
+    if(leafletMarkersLayer[idx]) setActivePin(idx);
+  }
+}
+
+function jumpToCard(idx){
+  const track = document.getElementById("cardTrack");
+  const cards = track.querySelectorAll(".stop-card");
+  if(!cards.length || !cards[idx]) return;
+  const cw = cards[0].offsetWidth + 10;
+  track.scrollTo({left:cw*idx, behavior:"smooth"});
+  curCard = idx;
+  onCardChange(idx);
+}
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+buildTabs();
+// Wait for fonts + layout before init
+document.fonts.ready.then(()=>{
+  initMap(0);
+  // Give Leaflet time to size
+  setTimeout(()=>{ map.invalidateSize(); switchDay(0); }, 300);
+  setTimeout(()=>{ map.invalidateSize(); }, 800);
+}).catch(()=>{
+  // Fonts API not available — fallback
+  setTimeout(()=>{
+    initMap(0);
+    setTimeout(()=>{ map.invalidateSize(); switchDay(0); }, 200);
+  }, 100);
+});
+
+window.addEventListener("resize",()=>{ if(typeof map!=="undefined"&&map) map.invalidateSize(); },{passive:true});
+
+</script>
+</body>
+</html>
