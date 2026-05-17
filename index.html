@@ -31,7 +31,7 @@
   --s2:0 6px 28px rgba(50,38,28,.13);
   --s3:0 16px 52px rgba(50,38,28,.18);
   --s4:0 26px 68px rgba(50,38,28,.22);
-  --hdr:66px; --tabs:44px; --sheet:258px; --card-img:90px; --mbar:46px;
+  --hdr:66px; --tabs:44px; --sheet:300px; --card-img:90px; --mbar:46px;
   --sp:.38s cubic-bezier(.34,1.56,.64,1);
   --eo:.26s cubic-bezier(.22,.68,0,1);
   --ei:.32s cubic-bezier(.4,0,.2,1);
@@ -254,7 +254,7 @@ body{
   position:absolute;bottom:0;left:0;right:0;
   /* cap height so it never exceeds 55% of screen */
   height:calc(var(--sheet) + var(--mbar) + env(safe-area-inset-bottom, 0px));
-  max-height:56vh;
+  max-height:62vh;
   z-index:50;pointer-events:none;
   background:var(--cream);
 }
@@ -330,7 +330,7 @@ body{
 .sc-time{position:absolute;bottom:9px;right:10px;z-index:2;font-size:8px;font-weight:600;color:rgba(255,255,255,.90);text-shadow:0 1px 3px rgba(0,0,0,.40);letter-spacing:.2px}
 
 /* card body */
-.sc-body{padding:11px 14px 13px;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.sc-body{padding:11px 14px 13px;overflow-y:auto;-webkit-overflow-scrolling:touch;max-height:200px;}
 .sc-titles{margin-bottom:6px}
 .sc-name-jp{font-family:'Noto Serif JP',serif;font-size:13px;font-weight:400;color:var(--ink);letter-spacing:.4px;line-height:1.3;margin-bottom:1px}
 .sc-name-zh{font-size:10.5px;font-weight:500;color:var(--ink-soft);letter-spacing:.2px}
@@ -345,7 +345,7 @@ body{
 .tag-night{background:var(--lav-g);color:var(--lav)}
 .tag-port {background:var(--teal-g);color:var(--teal)}
 .tag-flower{background:var(--blush-g);color:var(--blush)}
-.sc-note{font-size:11px;color:var(--ink-mid);line-height:1.65;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:10px;font-weight:300}
+.sc-note{font-size:11px;color:var(--ink-mid);line-height:1.65;margin-bottom:10px;font-weight:300}
 .sc-btns{display:flex;gap:7px;flex-shrink:0;padding-top:2px}
 .sc-btn{
   display:inline-flex;align-items:center;gap:3px;
