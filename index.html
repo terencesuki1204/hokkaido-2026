@@ -698,6 +698,7 @@ const IMGS = {
   orgel:         "image/orgel.jpg",
   sankaku:       "image/sankaku.webp",
   letao:         "image/letao.jpg",
+  tenguyama:     "image/tenguyama.jpg",
 
 
   /* ── 札幌 ── */
@@ -709,6 +710,8 @@ const IMGS = {
   king:          "image/king.jpg",
   sappo_market:  "image/sappo_market.jpg",
   yakiniku:      "image/yakiniku.jpg",
+  loft:          "image/loft.jpg",
+  coffee:        "image/coffee.jpg",
 
   /* ── 富良野 ── */
   tomita:        "image/tomita.jpg",
@@ -958,12 +961,12 @@ const itineraryData = [
        note:"小樽著名傳統市場，海鮮新鮮直送，氣氛熱鬧。",
        img:IMGS.sankaku, latlng:[43.196, 140.993]},
 
-      {nameJp:"小樽運河・朝の光", nameZh:"小樽運河日景",
-       region:"小樽市", time:"上午", duration:"45min",
+      {nameJp:"天狗山展望台", nameZh:"天狗山展望台",
+       region:"小樽市", time:"上午", duration:"1hr",
        type:"sight", typeLabel:"景點",
-       emoji:"☀️", mapQuery:"小樽運河 北海道",
-       note:"早上人少，陽光映照水面，清新怡人。",
-       img:IMGS.otaru_canal, latlng:[43.196, 140.994]},
+       emoji:"⛰️", mapQuery:"天狗山 小樽 北海道",
+       note:"小樽最高峰，展望台可俯瞰小樽市區及海港全景，纜車上山約 ¥700。",
+       img:IMGS.tenguyama, latlng:[43.151, 141.032]},
 
       {nameJp:"出発・札幌へ", nameZh:"出發 · 前往札幌",
        region:"高速公路", time:"11:00", duration:"40min",
@@ -985,6 +988,13 @@ const itineraryData = [
        emoji:"🦝", mapQuery:"狸小路 札幌 北海道",
        note:"最老有蓋商店街，藥妝、服裝、土產密集。",
        img:IMGS.tanukikoji, latlng:[43.058, 141.351]},
+
+      {nameJp:"モユク札幌ロフト", nameZh:"モユク札幌 Loft · 購物",
+      region:"札幌市", time:"晚上", duration:"1.5hr",
+      type:"shop", typeLabel:"購物",
+      emoji:"🛍️", mapQuery:"モユク札幌ロフト 北海道",
+      note:"札幌人氣購物商場，Loft 文具雜貨、生活小物齊全，晚上逛街首選。",
+      img:IMGS.loft, latlng:[43.062, 141.357]},
     ]
   },
 
@@ -1125,6 +1135,13 @@ const itineraryData = [
     theme:"最後購物✈️ · 出發回家",
     drive:{route:"札幌 → 新千歲機場", km:"約50km", time:"約1hr"},
     stops:[
+      {nameJp:"丸美珈琲店 大通公園本店", nameZh:"丸美珈琲 · 早餐咖啡",
+       region:"札幌市", time:"早上", duration:"45min",
+       type:"cafe", typeLabel:"Café",
+       emoji:"☕", mapQuery:"丸美珈琲店 大通公園本店 札幌 北海道",
+       note:"札幌人氣精品咖啡館，手沖咖啡香醇，配搭早餐輕食，出發前最後一杯北海道咖啡。",
+       img:IMGS.coffee, latlng:[43.060, 141.351]},
+    
       {nameJp:"出発・新千歳空港へ", nameZh:"出發 · 前往機場",
        region:"高速公路", time:"10:30", duration:"1hr",
        type:"drive", typeLabel:"自駕",
