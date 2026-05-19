@@ -41,22 +41,22 @@
    RESET
 ════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-html{height:100%;overflow:hidden}body{overflow:hidden}
+html{height:auto;min-height:100%}
 body{
   font-family:'Noto Sans TC',sans-serif;
   color:var(--ink);background:var(--cream);
   display:flex;flex-direction:column;
   width:100%;max-width:430px;
   margin-left:auto;margin-right:auto;
-  position:fixed;
-  top:0;left:0;right:0;
-  /* svh = small viewport = excludes Safari browser chrome bar */
-  /* JS overrides with exact visualViewport.height */
-  height:100svh;
-  overflow:hidden;
+  /* allow vertical scroll; remove position:fixed so page is scrollable */
+  min-height:100svh;
+  overflow-x:hidden;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
   padding-top:env(safe-area-inset-top,0px);
   padding-left:env(safe-area-inset-left,0px);
   padding-right:env(safe-area-inset-right,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 
 /* ════════════════════════════════
@@ -127,7 +127,7 @@ body{
 /* ════════════════════════════════
    MAP AREA
 ════════════════════════════════ */
-.map-area{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:none;-webkit-overflow-scrolling:none;min-height:200px;}
+.map-area{flex:1;position:relative;overflow:hidden;min-height:320px;touch-action:none;-webkit-overflow-scrolling:none;}
 
 /* Leaflet map container */
 #leaflet-map{
@@ -534,38 +534,25 @@ function getVisibleHeight(){
 }
 
 function applyHeight(){
-  const h = getVisibleHeight();
-  document.body.style.height = h + 'px';
-  document.body.style.maxHeight = h + 'px';
-  // Reposition body if visualViewport has an offset (e.g. when keyboard opens)
-  if(window.visualViewport){
-    document.body.style.top = window.visualViewport.offsetTop + 'px';
+  // Body is no longer position:fixed — no need to force exact height/top.
+  // Just invalidate the Leaflet map so tiles redraw after viewport changes.
+  if(typeof map !== 'undefined' && map){
+    setTimeout(function(){ map.invalidateSize(); }, 50);
   }
 }
 
-// Fire immediately
-applyHeight();
-
-// visualViewport resize is the correct event for Safari toolbar show/hide
+// visualViewport resize covers Safari toolbar show/hide
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize', function(){
-    applyHeight();
-    if(typeof map !== 'undefined' && map){
-      setTimeout(function(){ map.invalidateSize(); }, 50);
-    }
-  }, {passive:true});
-  window.visualViewport.addEventListener('scroll', applyHeight, {passive:true});
+  window.visualViewport.addEventListener('resize', applyHeight, {passive:true});
 }
 
 // Fallback resize handler
 window.addEventListener('resize', function(){
-  applyHeight();
   if(typeof map !== 'undefined' && map) map.invalidateSize();
 }, {passive:true});
 
 window.addEventListener('orientationchange', function(){
   setTimeout(function(){
-    applyHeight();
     if(typeof map !== 'undefined' && map) map.invalidateSize();
   }, 350);
 });
