@@ -41,22 +41,20 @@
    RESET
 ════════════════════════════════ */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-font-smoothing:antialiased}
-html{height:auto;min-height:100%}
+html{height:100%;overflow:hidden}
 body{
   font-family:'Noto Sans TC',sans-serif;
   color:var(--ink);background:var(--cream);
   display:flex;flex-direction:column;
   width:100%;max-width:430px;
   margin-left:auto;margin-right:auto;
-  /* allow vertical scroll; remove position:fixed so page is scrollable */
-  min-height:100svh;
-  overflow-x:hidden;
-  overflow-y:auto;
-  -webkit-overflow-scrolling:touch;
+  position:fixed;
+  top:0;left:0;right:0;
+  height:100svh;
+  overflow:hidden;
   padding-top:env(safe-area-inset-top,0px);
   padding-left:env(safe-area-inset-left,0px);
   padding-right:env(safe-area-inset-right,0px);
-  padding-bottom:env(safe-area-inset-bottom,0px);
 }
 
 /* ════════════════════════════════
@@ -127,7 +125,7 @@ body{
 /* ════════════════════════════════
    MAP AREA
 ════════════════════════════════ */
-.map-area{flex:1;position:relative;overflow:hidden;min-height:320px;touch-action:none;-webkit-overflow-scrolling:none;}
+.map-area{flex:1;position:relative;overflow:hidden;min-height:0;touch-action:none;}
 
 /* Leaflet map container */
 #leaflet-map{
@@ -150,9 +148,10 @@ body{
 
 /* OSM credit — subtle */
 .osm-credit{
-  position:absolute;bottom:calc(var(--sheet) + var(--mbar) + 4px);left:50%;transform:translateX(-50%);
+  position:absolute;bottom:calc(var(--sheet-vis,72px) + 4px);left:50%;transform:translateX(-50%);
   font-size:7.5px;color:rgba(100,90,80,.38);letter-spacing:.3px;
   z-index:22;white-space:nowrap;pointer-events:none;
+  transition:bottom .34s cubic-bezier(.22,.68,0,1);
 }
 
 /* ── DAY INFO PILL ── */
@@ -172,7 +171,7 @@ body{
 .mp-chip.d{background:var(--sand-g);color:var(--sand)}
 
 /* ── MAP CONTROLS ── */
-.map-controls{position:absolute;bottom:calc(var(--sheet) + var(--mbar) + 14px);right:14px;display:flex;flex-direction:column;gap:5px;z-index:25}
+.map-controls{position:absolute;bottom:calc(var(--sheet-vis,72px) + 14px);right:14px;display:flex;flex-direction:column;gap:5px;z-index:25;transition:bottom .34s cubic-bezier(.22,.68,0,1);}
 .mc-btn{
   width:44px;height:44px;border-radius:13px;
   background:var(--g1);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
@@ -248,41 +247,94 @@ body{
 /* Route polyline drawn via Leaflet polyline — no separate SVG needed */
 
 /* ════════════════════════════════
-   BOTTOM SHEET
+   DRAGGABLE BOTTOM SHEET
 ════════════════════════════════ */
-.bottom-sheet{
-  position:absolute;bottom:0;left:0;right:0;
-  /* cap height so it never exceeds 55% of screen */
-  height:calc(var(--sheet) + var(--mbar) + env(safe-area-inset-bottom, 0px));
-  max-height:62vh;
-  z-index:50;pointer-events:none;
+.dsheet{
+  position:absolute;left:0;right:0;bottom:0;
+  height:72vh;
+  display:flex;flex-direction:column;
+  z-index:50;
   background:var(--cream);
+  border-radius:22px 22px 0 0;
+  box-shadow:0 -3px 28px rgba(50,38,28,.13),0 -1px 4px rgba(50,38,28,.06);
+  will-change:transform;
+  pointer-events:all;
 }
-/* frosted gradient fade above cards */
-.sheet-fog{
-  position:absolute;top:0;left:0;right:0;height:28px;
-  background:linear-gradient(to bottom,rgba(247,244,239,0),rgba(247,244,239,0));
-  pointer-events:none;
+.dsheet.ds-anim{
+  transition:transform .38s cubic-bezier(.22,.68,0,1);
 }
-.sheet-handle{
-  position:absolute;top:var(--mbar);left:0;right:0;
-  height:22px;pointer-events:all;z-index:52;
-  display:flex;align-items:center;justify-content:center;
+/* safe-area filler below sheet on notch phones */
+.dsheet::after{
+  content:'';position:absolute;
+  bottom:0;left:0;right:0;
+  height:env(safe-area-inset-bottom,0px);
+  background:var(--cream);pointer-events:none;
+}
+.dsheet-header{
+  flex-shrink:0;
+  padding-top:10px;
   cursor:grab;touch-action:none;
+  border-radius:22px 22px 0 0;
+  background:var(--cream);
+  position:relative;z-index:2;
+  /* subtle separator line */
+  box-shadow:0 1px 0 rgba(190,178,162,.12);
 }
-.sheet-handle::after{
-  content:'';display:block;
-  width:32px;height:4px;border-radius:4px;
-  background:rgba(170,155,140,.28);
+.dsheet-pill{
+  width:36px;height:4px;border-radius:4px;
+  background:rgba(170,155,140,.30);
+  margin:0 auto 8px;
+  transition:background .2s;
 }
-.card-dots{position:absolute;top:calc(var(--mbar) + 10px);left:0;right:0;display:flex;justify-content:center;gap:4px;pointer-events:none;z-index:52}
+.dsheet-header:active .dsheet-pill{background:rgba(170,155,140,.55)}
+
+/* ── MODE BAR (now inside sheet header, no longer absolute) ── */
+.mode-bar{
+  display:flex;align-items:center;justify-content:center;
+  gap:4px;padding:0 14px 10px;
+  pointer-events:all;
+  touch-action:manipulation;
+}
+.mode-pill{
+  display:flex;align-items:center;gap:5px;
+  padding:9px 16px;border-radius:20px;
+  font-size:11.5px;font-weight:600;letter-spacing:.1px;
+  cursor:pointer;border:none;font-family:inherit;
+  color:var(--ink-soft);background:transparent;
+  transition:all var(--eo);white-space:nowrap;
+  flex:1;justify-content:center;max-width:110px;
+  min-height:40px;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;
+  -webkit-tap-highlight-color:transparent;
+}
+.mode-pill .mp-e{font-size:15px;line-height:1}
+.mode-pill.active{
+  background:var(--surface);
+  color:var(--ink);
+  box-shadow:var(--s1),inset 0 0 0 1px rgba(255,255,255,.7);
+  border-radius:20px;
+}
+.mode-pill.active .mp-e{transform:scale(1.12)}
+.mode-pill:active{transform:scale(.93)}
+
+/* ── SHEET BODY (card area) ── */
+.dsheet-body{
+  flex:1;min-height:0;
+  position:relative;overflow:hidden;
+}
+.card-dots{
+  position:absolute;top:5px;left:0;right:0;
+  display:flex;justify-content:center;gap:4px;
+  pointer-events:none;z-index:52;
+}
 .cdot{width:4.5px;height:4.5px;border-radius:3px;background:rgba(165,150,135,.22);transition:width .32s var(--sp),background .2s}
 .cdot.on{width:14px;background:var(--azure)}
 .card-track{
-  position:absolute;top:calc(var(--mbar) + 22px);left:0;right:0;bottom:0;
+  position:absolute;top:22px;left:0;right:0;bottom:0;
   display:flex;align-items:flex-start;gap:10px;
   overflow-x:auto;overflow-y:hidden;
-  padding:4px 18px calc(14px + env(safe-area-inset-bottom, 0px));
+  padding:4px 18px calc(14px + env(safe-area-inset-bottom,0px));
   scroll-snap-type:x mandatory;scrollbar-width:none;
   pointer-events:all;
   -webkit-overflow-scrolling:touch;
@@ -359,52 +411,6 @@ body{
 .sc-btn:active{transform:scale(.91)}
 .sc-btn.map{color:var(--sage);background:rgba(122,158,120,.10);border-color:rgba(122,158,120,.20)}
 
-/* ════════════════════════════════
-   MODE BAR (浮在 bottom sheet 上方)
-════════════════════════════════ */
-.mode-bar{
-  position:absolute;
-  bottom:calc(var(--sheet) + env(safe-area-inset-bottom, 0px));
-  left:0;right:0;
-  height:var(--mbar);
-  display:flex;align-items:center;justify-content:center;
-  gap:4px;z-index:55;
-  background:rgba(247,244,239,.97);
-  backdrop-filter:blur(18px) saturate(1.5);-webkit-backdrop-filter:blur(18px) saturate(1.5);
-  border-top:1px solid rgba(190,178,162,.14);
-  pointer-events:all;
-  touch-action:manipulation;
-}
-/* safe area gap filler below mode-bar */
-.mode-bar::after{
-  content:'';position:absolute;
-  top:100%;left:0;right:0;
-  height:env(safe-area-inset-bottom, 34px);
-  background:rgba(247,244,239,.97);
-  z-index:1;
-}
-.mode-pill{
-  display:flex;align-items:center;gap:5px;
-  padding:10px 18px;border-radius:20px;
-  font-size:11.5px;font-weight:600;letter-spacing:.1px;
-  cursor:pointer;border:none;font-family:inherit;
-  color:var(--ink-soft);background:transparent;
-  transition:all var(--eo);white-space:nowrap;
-  flex:1;justify-content:center;max-width:110px;
-  min-height:44px;
-  -webkit-user-select:none;user-select:none;
-  touch-action:manipulation;
-  -webkit-tap-highlight-color:transparent;
-}
-.mode-pill .mp-e{font-size:15px;line-height:1}
-.mode-pill.active{
-  background:var(--surface);
-  color:var(--ink);
-  box-shadow:var(--s1),inset 0 0 0 1px rgba(255,255,255,.7);
-  border-radius:20px;
-}
-.mode-pill.active .mp-e{transform:scale(1.12)}
-.mode-pill:active{transform:scale(.93)}
 
 /* ── alt separator (inside alt-group card) ── */
 .alt-sep{display:flex;align-items:center;gap:8px;padding:2px 14px}
@@ -492,24 +498,28 @@ a{text-decoration:none}
     <div class="mc-btn" id="btnZoomOut">－</div>
   </div>
 
-  <!-- Mode Bar — floats above bottom sheet -->
-  <div class="mode-bar" id="modeBar">
-    <button class="mode-pill active" data-mode="stops" onclick="switchMode('stops')">
-      <span class="mp-e">🗺</span><span>景點</span>
-    </button>
-    <button class="mode-pill" data-mode="food" onclick="switchMode('food')">
-      <span class="mp-e">🍜</span><span>食飯</span>
-    </button>
-    <button class="mode-pill" data-mode="hotel" onclick="switchMode('hotel')">
-      <span class="mp-e">🏨</span><span>住宿</span>
-    </button>
-  </div>
-
-  <!-- Bottom sheet — single unified track -->
-  <div class="bottom-sheet">
-    <div class="sheet-handle"></div>
-    <div class="card-dots" id="cardDots"></div>
-    <div class="card-track" id="cardTrack"></div>
+  <!-- Draggable Bottom Sheet -->
+  <div class="dsheet" id="dsheet">
+    <!-- Header: drag handle + mode buttons — always visible -->
+    <div class="dsheet-header" id="dsheetHeader">
+      <div class="dsheet-pill" id="dsheetPill"></div>
+      <div class="mode-bar" id="modeBar">
+        <button class="mode-pill active" data-mode="stops" onclick="switchMode('stops')">
+          <span class="mp-e">🗺</span><span>景點</span>
+        </button>
+        <button class="mode-pill" data-mode="food" onclick="switchMode('food')">
+          <span class="mp-e">🍜</span><span>食飯</span>
+        </button>
+        <button class="mode-pill" data-mode="hotel" onclick="switchMode('hotel')">
+          <span class="mp-e">🏨</span><span>住宿</span>
+        </button>
+      </div>
+    </div>
+    <!-- Body: card dots + card track -->
+    <div class="dsheet-body">
+      <div class="card-dots" id="cardDots"></div>
+      <div class="card-track" id="cardTrack"></div>
+    </div>
   </div>
 
 </div>
@@ -534,25 +544,34 @@ function getVisibleHeight(){
 }
 
 function applyHeight(){
-  // Body is no longer position:fixed — no need to force exact height/top.
-  // Just invalidate the Leaflet map so tiles redraw after viewport changes.
-  if(typeof map !== 'undefined' && map){
-    setTimeout(function(){ map.invalidateSize(); }, 50);
+  const h = getVisibleHeight();
+  document.body.style.height = h + 'px';
+  document.body.style.maxHeight = h + 'px';
+  if(window.visualViewport){
+    document.body.style.top = window.visualViewport.offsetTop + 'px';
   }
+  // Re-snap sheet to recalculate snap points for new viewport size
+  if(typeof dsInit === 'function') setTimeout(dsInit, 50);
 }
 
-// visualViewport resize covers Safari toolbar show/hide
+applyHeight();
+
 if(window.visualViewport){
-  window.visualViewport.addEventListener('resize', applyHeight, {passive:true});
+  window.visualViewport.addEventListener('resize', function(){
+    applyHeight();
+    if(typeof map !== 'undefined' && map) setTimeout(function(){ map.invalidateSize(); }, 80);
+  }, {passive:true});
+  window.visualViewport.addEventListener('scroll', applyHeight, {passive:true});
 }
 
-// Fallback resize handler
 window.addEventListener('resize', function(){
+  applyHeight();
   if(typeof map !== 'undefined' && map) map.invalidateSize();
 }, {passive:true});
 
 window.addEventListener('orientationchange', function(){
   setTimeout(function(){
+    applyHeight();
     if(typeof map !== 'undefined' && map) map.invalidateSize();
   }, 350);
 });
@@ -1569,7 +1588,11 @@ function switchDay(idx){
    MODE SWITCH — the heart of new UX
 ═══════════════════════════════════════════════════ */
 function switchMode(mode){
-  if(mode === curMode) return;
+  if(mode === curMode){
+    // Same mode tapped: toggle peek/collapsed
+    if(typeof dsExpandToPeek === 'function') dsExpandToPeek();
+    return;
+  }
   curMode = mode;
   curCard = 0;
 
@@ -1579,6 +1602,8 @@ function switchMode(mode){
   });
 
   renderDayLayer();
+  // Expand sheet so user can see cards
+  if(typeof dsExpandToPeek === 'function') dsExpandToPeek();
 }
 
 /* ─── Master render dispatcher ─── */
@@ -1995,20 +2020,152 @@ function jumpToCard(idx){
 }
 
 /* ═══════════════════════════════════════════════════
+   DRAGGABLE BOTTOM SHEET ENGINE
+═══════════════════════════════════════════════════ */
+(function(){
+  const sheet   = document.getElementById('dsheet');
+  const header  = document.getElementById('dsheetHeader');
+  const pill    = document.getElementById('dsheetPill');
+  const mapArea = document.getElementById('mapArea');
+
+  // Snap point labels → visible px from bottom
+  let snaps = { collapsed:0, peek:0, expanded:0 };
+  let sheetH   = 0;   // sheet.offsetHeight (= 72vh)
+  let visiblePx = 0;  // how many px of sheet are visible right now
+  let state = 'collapsed';
+
+  // Touch tracking
+  let activeTouchId = null;
+  let dragStartY    = 0;
+  let dragStartVis  = 0;
+  let lastY = 0, lastT = 0, velY = 0; // for flick detection
+
+  function calcSnaps(){
+    sheetH  = sheet.offsetHeight;
+    const headerH = header.offsetHeight;
+    const mapH    = mapArea.offsetHeight;
+    snaps.collapsed = headerH;                          // only header visible
+    snaps.peek      = Math.round(Math.min(mapH * 0.44, sheetH * 0.78)); // ~44% of map
+    snaps.expanded  = Math.round(Math.min(mapH * 0.68, sheetH));        // ~68% of map
+  }
+
+  function setVisible(px, animated){
+    px = Math.max(snaps.collapsed, Math.min(snaps.expanded, px));
+    visiblePx = px;
+    const ty = sheetH - px;
+    sheet.classList.toggle('ds-anim', !!animated);
+    sheet.style.transform = 'translateY(' + ty + 'px)';
+    mapArea.style.setProperty('--sheet-vis', px + 'px');
+  }
+
+  function snapNearest(flickVel /* px/s */){
+    const pts = [snaps.collapsed, snaps.peek, snaps.expanded];
+    let target;
+    const FLICK = 350; // px/s threshold
+    if(flickVel < -FLICK){
+      // fast swipe up → next snap above
+      target = pts.filter(p => p > visiblePx + 15).sort((a,b)=>a-b)[0];
+    } else if(flickVel > FLICK){
+      // fast swipe down → next snap below
+      target = pts.filter(p => p < visiblePx - 15).sort((a,b)=>b-a)[0];
+    }
+    if(target === undefined){
+      target = pts.reduce((a,b) => Math.abs(b-visiblePx) < Math.abs(a-visiblePx) ? b : a);
+    }
+    setVisible(target, true);
+    state = Object.keys(snaps).find(k => snaps[k] === target) || 'collapsed';
+    setTimeout(function(){ if(typeof map!=='undefined'&&map) map.invalidateSize(); }, 400);
+  }
+
+  // ── Touch handlers on header ──
+  header.addEventListener('touchstart', function(e){
+    if(e.target.closest('.mode-pill')) return; // let button handle its tap
+    activeTouchId = e.touches[0].identifier;
+    dragStartY    = e.touches[0].clientY;
+    dragStartVis  = visiblePx;
+    lastY = dragStartY; lastT = Date.now(); velY = 0;
+    sheet.classList.remove('ds-anim');
+  }, {passive:true});
+
+  header.addEventListener('touchmove', function(e){
+    if(activeTouchId === null) return;
+    const t = Array.from(e.touches).find(t=>t.identifier===activeTouchId);
+    if(!t) return;
+    const now = Date.now();
+    const dy  = t.clientY - lastY;
+    const dt  = now - lastT || 1;
+    velY  = (dy / dt) * 1000; // px/s (positive = finger moving down)
+    lastY = t.clientY; lastT = now;
+
+    // visible grows when finger moves up (negative dy)
+    let newVis = dragStartVis - (t.clientY - dragStartY);
+    // rubber-band beyond bounds
+    if(newVis > snaps.expanded){
+      newVis = snaps.expanded + (newVis - snaps.expanded) * 0.18;
+    } else if(newVis < snaps.collapsed){
+      newVis = snaps.collapsed - (snaps.collapsed - newVis) * 0.25;
+    }
+    visiblePx = newVis;
+    const ty = sheetH - newVis;
+    sheet.style.transform = 'translateY(' + ty + 'px)';
+    mapArea.style.setProperty('--sheet-vis', Math.max(snaps.collapsed, newVis) + 'px');
+    e.preventDefault();
+  }, {passive:false});
+
+  header.addEventListener('touchend', function(){
+    if(activeTouchId === null) return;
+    activeTouchId = null;
+    snapNearest(velY);
+  }, {passive:true});
+
+  header.addEventListener('touchcancel', function(){
+    activeTouchId = null;
+    snapNearest(0);
+  }, {passive:true});
+
+  // ── Tap pill to toggle collapsed ↔ peek ──
+  pill.addEventListener('click', function(){
+    if(state === 'collapsed'){
+      setVisible(snaps.peek, true); state = 'peek';
+    } else {
+      setVisible(snaps.collapsed, true); state = 'collapsed';
+    }
+    setTimeout(function(){ if(typeof map!=='undefined'&&map) map.invalidateSize(); }, 400);
+  });
+
+  // ── Public init (called after layout stable) ──
+  window.dsInit = function(){
+    calcSnaps();
+    setVisible(snaps.collapsed, false);
+    state = 'collapsed';
+  };
+
+  // ── Expose peek helper for switchMode ──
+  window.dsExpandToPeek = function(){
+    if(state === 'collapsed'){
+      calcSnaps();
+      setVisible(snaps.peek, true);
+      state = 'peek';
+      setTimeout(function(){ if(typeof map!=='undefined'&&map) map.invalidateSize(); }, 400);
+    }
+  };
+})();
+
+/* ═══════════════════════════════════════════════════
    INIT
 ═══════════════════════════════════════════════════ */
 buildTabs();
 // Wait for fonts + layout before init
 document.fonts.ready.then(()=>{
   initMap(0);
-  // Give Leaflet time to size
-  setTimeout(()=>{ applyHeight(); map.invalidateSize(); switchDay(0); }, 300);
-  setTimeout(()=>{ map.invalidateSize(); }, 800);
+  // Give Leaflet time to size, then init sheet
+  setTimeout(()=>{ applyHeight(); map.invalidateSize(); switchDay(0); if(typeof dsInit==='function') dsInit(); }, 300);
+  setTimeout(()=>{ map.invalidateSize(); if(typeof dsInit==='function') dsInit(); }, 800);
 }).catch(()=>{
   // Fonts API not available — fallback
   setTimeout(()=>{
     initMap(0);
-    setTimeout(()=>{ map.invalidateSize(); switchDay(0); }, 200);
+    setTimeout(()=>{ map.invalidateSize(); switchDay(0); if(typeof dsInit==='function') dsInit(); }, 200);
   }, 100);
 });
 
